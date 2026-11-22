@@ -40,5 +40,8 @@ bin/link        # symlinks workflow/ into Alfred's workflows folder
 bin/make-icons  # re-renders workflow/icons/ from assets/agents/*.svg (rsvg-convert, magick)
 ```
 
+`bin/test` replays `tests/fixtures` through a fake `hc` and diffs `hd` and `hdp` against
+`tests/expected/`; jq only, no Alfred or Herdr.
+
 The agent logos in `assets/agents/` are the ones the Herdr app shows; each `hd` row combines its
 agent's logo with a status dot. An agent without a logo gets the generic `agent` icon.

@@ -7,6 +7,7 @@ set -u
 PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 hc_bin=${HC:-hc}
 query=${1-}
+lib=${0:A:h:h}/lib
 
 # One invalid row, so Alfred says what went wrong instead of showing nothing.
 fail() {
@@ -17,25 +18,11 @@ fail() {
 out=$("$hc_bin" ls --json 2>&1) ||
   fail "Herdr core is not running" "${out:-$hc_bin ls --json failed}"
 
-json=$(jq -c --arg q "$query" --arg home "$HOME" '
-  def rank: if . == "blocked" then 0 elif . == "working" then 1
-            elif . == "done" then 2 elif . == "idle" then 3 else 4 end;
-  # icons/<logo>-<status>.png, made by bin/make-icons
-  def logo: {"claude-code":"claude","claude":"claude","codex":"codex","opencode":"opencode",
-             "kiro-cli":"kiro","kiro":"kiro","gemini":"gemini","antigravity":"antigravity",
-             "agy":"antigravity"}[.] // "agent";
-  def iconpath($status): "icons/\(logo)-\(if ["blocked","working","done","idle"]
-                                            | index([$status]) then $status else "none" end).png";
-  def statusword: if type == "string" and length > 0 then . else "no status" end;
+json=$(jq -c -L "$lib" --arg q "$query" --arg home "$HOME" '
+  include "agents";
   ($q | ascii_downcase | split(" ") | map(select(length > 0))) as $words
-  | [.terminals[]
-      | . + {cwd: (.cwd // ""), turn: (.turn // 0), agent: (.agent // "?")}
-      | select(.state == "live")
-      | select((.agent | test("^(zsh|bash|sh|fish|nvim|vim)$")) | not)
-      | . + {cwdshort: (if .cwd == $home then "~"
-                        elif (.cwd | startswith($home + "/")) then "~" + .cwd[($home | length):]
-                        else .cwd end)}]
-  | map(. as $r
+  | agentrecords($home)
+  | map((. + {agent: (.agent // "?")}) as $r
       | {rank: ($r.status | rank),
          hay: ([($r.name // ""), $r.agent, ($r.where // ""), $r.cwd, ($r.status // "")]
                | map(ascii_downcase) | join(" ")),
@@ -44,7 +31,7 @@ json=$(jq -c --arg q "$query" --arg home "$HOME" '
                            + " · turn " + ($r.turn | tostring) + " · " + $r.cwdshort
                            + (if $r.parent then " · under " + $r.parent else "" end)),
                 arg: $r.address,
-                icon: {path: ($r.agent | iconpath($r.status))},
+                icon: {path: ($r.agent | iconpath("icons"; $r.status))},
                 valid: true}})
   | to_entries
   | map(select(.value as $v | all($words[]; . as $w | ($v.hay | contains($w)))))
