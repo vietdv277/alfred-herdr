@@ -21,6 +21,6 @@ for svg in assets/agents/*.svg; do
     else
       dot=(-fill '#1C1C1E' -stroke '#8E8E93' -strokewidth 5 -draw 'circle 105,105 105,87')
     fi
-    magick "$tmp/tile.png" $dot +repage "workflow/icons/$agent-$st.png"
+    magick "$tmp/tile.png" $dot +repage -units PixelsPerInch -density 288 "workflow/icons/$agent-$st.png"
   done
 done

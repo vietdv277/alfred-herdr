@@ -21,6 +21,12 @@ instead. The list refreshes once a second while it is open.
 Type `hdp` to open a floating panel instead: a window listing the agents, refreshed every 2 s. It
 stays above other apps, remembers its position between launches and closes with <kbd>⎋</kbd>.
 Clicking a row jumps to that agent the same way <kbd>↩</kbd> does in `hd`.
+The list scrolls when there are more agents than fit. The panel also opens from a script or another
+workflow through the external trigger `panel`:
+
+```sh
+osascript -e 'tell application id "com.runningwithcrayons.Alfred" to run trigger "panel" in workflow "com.vietdv277.alfred-herdr"'
+```
 
 ## Requirements
 

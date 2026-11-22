@@ -14,3 +14,5 @@ if [ -e "$dst" ] && [ ! -L "$dst" ]; then
 fi
 ln -sfn "$src" "$dst"
 echo "linked $dst -> $src"
+# Alfred does not watch symlink targets, so a relink needs an explicit reload.
+osascript -e 'tell application id "com.runningwithcrayons.Alfred" to reload workflow "com.vietdv277.alfred-herdr"' >/dev/null

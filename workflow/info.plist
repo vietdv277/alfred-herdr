@@ -8,6 +8,19 @@
 	<string>Tools</string>
 	<key>connections</key>
 	<dict>
+		<key>46EED1AB-388D-4E9B-9239-CF69A5961A1D</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>069BC4A1-5966-4CCD-9E38-89468A0D0D5D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>94BB9498-18FF-42E7-98A7-017C3DF5C448</key>
 		<array>
 			<dict>
@@ -157,6 +170,21 @@
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>availableviaurlhandler</key>
+				<false/>
+				<key>triggerid</key>
+				<string>panel</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.external</string>
+			<key>uid</key>
+			<string>46EED1AB-388D-4E9B-9239-CF69A5961A1D</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>## Usage
@@ -182,6 +210,13 @@ Clicking a row jumps to that agent the same way &lt;kbd&gt;↩&lt;/kbd&gt; does 
 			<integer>300</integer>
 			<key>ypos</key>
 			<integer>220</integer>
+		</dict>
+		<key>46EED1AB-388D-4E9B-9239-CF69A5961A1D</key>
+		<dict>
+			<key>xpos</key>
+			<integer>80</integer>
+			<key>ypos</key>
+			<integer>350</integer>
 		</dict>
 		<key>94BB9498-18FF-42E7-98A7-017C3DF5C448</key>
 		<dict>
