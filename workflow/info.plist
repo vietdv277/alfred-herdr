@@ -21,6 +21,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>F5359208-0056-4FBB-BCF1-A41203C7E52F</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>069BC4A1-5966-4CCD-9E38-89468A0D0D5D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<true/>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Viet Dinh Van</string>
@@ -104,6 +117,46 @@
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>launchmode</key>
+				<integer>1</integer>
+				<key>path</key>
+				<string>panel.alfredui</string>
+				<key>stackview</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.userinterface.alfredui</string>
+			<key>uid</key>
+			<string>069BC4A1-5966-4CCD-9E38-89468A0D0D5D</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>hdp</string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Floating live panel of Herdr agents</string>
+				<key>text</key>
+				<string>Herdr agents panel</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>F5359208-0056-4FBB-BCF1-A41203C7E52F</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>## Usage
@@ -119,19 +172,33 @@ peek instead.
 The list refreshes once a second while it is open.</string>
 	<key>uidata</key>
 	<dict>
+		<key>069BC4A1-5966-4CCD-9E38-89468A0D0D5D</key>
+		<dict>
+			<key>xpos</key>
+			<integer>300</integer>
+			<key>ypos</key>
+			<integer>220</integer>
+		</dict>
 		<key>94BB9498-18FF-42E7-98A7-017C3DF5C448</key>
 		<dict>
 			<key>xpos</key>
-			<real>80</real>
+			<real>80.0</real>
 			<key>ypos</key>
-			<real>70</real>
+			<real>70.0</real>
 		</dict>
 		<key>9A9F5B0B-7A30-4950-9829-3C1B5795B2A4</key>
 		<dict>
 			<key>xpos</key>
-			<real>320</real>
+			<real>320.0</real>
 			<key>ypos</key>
-			<real>70</real>
+			<real>70.0</real>
+		</dict>
+		<key>F5359208-0056-4FBB-BCF1-A41203C7E52F</key>
+		<dict>
+			<key>xpos</key>
+			<integer>80</integer>
+			<key>ypos</key>
+			<integer>220</integer>
 		</dict>
 	</dict>
 	<key>version</key>
