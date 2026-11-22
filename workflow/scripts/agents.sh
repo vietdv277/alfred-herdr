@@ -25,6 +25,7 @@ json=$(jq -c --arg q "$query" --arg home "$HOME" '
   def statusword: if type == "string" and length > 0 then . else "no status" end;
   ($q | ascii_downcase | split(" ") | map(select(length > 0))) as $words
   | [.terminals[]
+      | . + {cwd: (.cwd // ""), turn: (.turn // 0), agent: (.agent // "?")}
       | select(.state == "live")
       | select((.agent | test("^(zsh|bash|sh|fish|nvim|vim)$")) | not)
       | . + {cwdshort: (if .cwd == $home then "~"

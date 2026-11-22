@@ -6,7 +6,6 @@ set -u
 # Alfred runs scripts with a minimal PATH.
 PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 app_bin=${HERDR_APP:-herdr-app}
-hc_bin=${HC:-hc}
 addr=${1-}
 
 notify() {
@@ -27,13 +26,13 @@ for _ in {1..30}; do
 done
 [[ -n $ls_out ]] || { notify "Herdr Agents" "Herdr is not running"; exit 1 }
 
-listed=$(print -r -- "$ls_out" | jq -r --arg t "$addr" \
-  '[.. | objects | select(.terminal? == $t)] | length' 2>/dev/null)
+# Space and tab ids come from the app's own tree; hc labels miss the tab for some terminals.
+ids=$(print -r -- "$ls_out" | jq -r --arg t "$addr" '
+  first(.spaces[] as $s | $s.tabs[] as $b
+    | select([$b | .. | objects | select(.terminal? == $t)] | length > 0)
+    | [$s.id, $b.id] | @tsv) // empty' 2>/dev/null)
 
-if [[ ${listed:-0} -gt 0 ]]; then
-  # Space and tab ids come from the core's labels on the terminal.
-  ids=$("$hc_bin" get "$addr" --json 2>/dev/null |
-    jq -r '[.labels["herdr.space"] // "", .labels["herdr.tab"] // ""] | @tsv' 2>/dev/null)
+if [[ -n $ids ]]; then
   space=${ids%%$'\t'*}
   tab=${ids##*$'\t'}
   [[ -z ${space// } ]] || "$app_bin" do space.select --id "$space" >/dev/null 2>&1
