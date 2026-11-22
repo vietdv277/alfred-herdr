@@ -1,6 +1,9 @@
 {
   "bundleid": "com.vietdv277.alfred-herdr.panel",
-  "log": { "level": "info", "internal": false },
+  "log": {
+    "level": "info",
+    "internal": false
+  },
   "pulse": {
     "src": "scripts/pulse",
     "interval": 2,
@@ -16,33 +19,107 @@
     "blur": true,
     "fullscreenable": false,
     "minimisable": false,
-    "toolbar": { "type": "unifiedcompact" },
-    "size": { "width": 380, "height": 460 },
-    "minsize": { "width": 260, "height": 160 },
+    "toolbar": {
+      "type": "unifiedcompact"
+    },
+    "size": {
+      "width": 380,
+      "height": 460
+    },
+    "minsize": {
+      "width": 260,
+      "height": 160
+    },
     "root": {
       "type": "view",
       "layout": "border",
       "padding": 10,
       "spacing": 8,
       "shortcuts": [
-        { "shortcut": "⎋", "action": { "type": "function", "src": "herdrPanel", "args": "close" } }
+        {
+          "shortcut": "⎋",
+          "action": {
+            "type": "function",
+            "src": "herdrPanel",
+            "args": "close"
+          }
+        }
       ],
       "components": [
         {
           "id": "summary",
-          "constraints": { "region": "top" },
+          "constraints": {
+            "region": "top"
+          },
           "type": "label",
           "colour": "secondaryLabelColor",
           "text": "Loading…"
         },
         {
           "id": "agents",
-          "constraints": { "region": "centre" },
-          "type": "view",
-          "layout": "inline",
-          "direction": "vertical",
+          "constraints": {
+            "region": "centre"
+          },
+          "type": "dataview",
           "spacing": 6,
-          "components": []
+          "cell": {
+            "height": 46,
+            "root": {
+              "type": "view",
+              "layout": "border",
+              "padding": 6,
+              "spacing": 8,
+              "cornerradius": 6,
+              "background": "#80808018",
+              "components": [
+                {
+                  "id": "icon",
+                  "constraints": {
+                    "region": "left"
+                  },
+                  "type": "imageview"
+                },
+                {
+                  "constraints": {
+                    "region": "centre"
+                  },
+                  "type": "view",
+                  "layout": "inline",
+                  "direction": "vertical",
+                  "spacing": 1,
+                  "components": [
+                    {
+                      "id": "title",
+                      "type": "label"
+                    },
+                    {
+                      "id": "sub",
+                      "type": "label",
+                      "colour": "secondaryLabelColor",
+                      "font": {
+                        "size": 11
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "data": {
+            "type": "basic",
+            "src": []
+          },
+          "events": [
+            {
+              "triggers": "clicked",
+              "action": {
+                "type": "script",
+                "src": "scripts/focus",
+                "args": "{uid}",
+                "async": true
+              }
+            }
+          ]
         }
       ]
     }
