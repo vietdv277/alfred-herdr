@@ -1,0 +1,26 @@
+#!/bin/zsh
+# Render workflow/icons/<agent>-<status>.png: agent logo on a dark tile with a status dot.
+# Logos in assets/agents/ come from the Herdr app bundle. Needs rsvg-convert and magick.
+set -eu
+cd "${0:A:h}/.."
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+typeset -A colour=(blocked '#FF3B30' working '#FF9500' done '#34C759' idle '#8E8E93' none '')
+print -r -- 'svg { color: #FFFFFF; }' > "$tmp/white.css"
+mkdir -p workflow/icons
+
+for svg in assets/agents/*.svg; do
+  agent=${svg:t:r}
+  rsvg-convert -w 76 -h 76 --stylesheet "$tmp/white.css" "$svg" -o "$tmp/logo.png"
+  magick -size 128x128 xc:none -fill '#2C2C2E' -draw 'roundrectangle 4,4 113,113 24,24' \
+    "$tmp/logo.png" -gravity center -geometry -7-7 -composite "$tmp/tile.png"
+  for st in ${(k)colour}; do
+    if [[ -n $colour[$st] ]]; then
+      dot=(-fill $colour[$st] -stroke '#1C1C1E' -strokewidth 6 -draw 'circle 105,105 105,85')
+    else
+      dot=(-fill '#1C1C1E' -stroke '#8E8E93' -strokewidth 5 -draw 'circle 105,105 105,87')
+    fi
+    magick "$tmp/tile.png" $dot +repage "workflow/icons/$agent-$st.png"
+  done
+done

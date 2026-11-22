@@ -30,5 +30,9 @@ Clicking a row jumps to that agent the same way <kbd>↩</kbd> does in `hd`.
 ## Install (development)
 
 ```sh
-bin/link    # symlinks workflow/ into Alfred's workflows folder
+bin/link        # symlinks workflow/ into Alfred's workflows folder
+bin/make-icons  # re-renders workflow/icons/ from assets/agents/*.svg (rsvg-convert, magick)
 ```
+
+The agent logos in `assets/agents/` are the ones the Herdr app shows; each `hd` row combines its
+agent's logo with a status dot. An agent without a logo gets the generic `agent` icon.
