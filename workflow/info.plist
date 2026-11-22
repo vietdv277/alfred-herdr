@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.vietdv277.alfred-herdr</string>
+	<key>category</key>
+	<string>Tools</string>
+	<key>connections</key>
+	<dict>
+		<key>94BB9498-18FF-42E7-98A7-017C3DF5C448</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>9A9F5B0B-7A30-4950-9829-3C1B5795B2A4</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Viet Dinh Van</string>
+	<key>description</key>
+	<string>See and jump to every agent running in the Herdr app</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Herdr Agents</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>hd</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Listing Herdr agents…</string>
+				<key>script</key>
+				<string>/bin/zsh ./scripts/agents.sh "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Blocked first, then working, done and idle</string>
+				<key>title</key>
+				<string>Herdr Agents</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>94BB9498-18FF-42E7-98A7-017C3DF5C448</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>/bin/zsh ./scripts/focus.sh "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>9A9F5B0B-7A30-4950-9829-3C1B5795B2A4</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>## Usage
+
+Type `hd` in Alfred to list every agent running in the Herdr app. Blocked agents come first, then
+working, done and idle; sub-agents are listed under their parent. Type to narrow the list; all
+words must match.
+
+Press &lt;kbd&gt;↩&lt;/kbd&gt; to jump to the chosen agent: Herdr comes to the front, selects the agent's
+space and tab and focuses its pane. An agent with no pane, such as a parked sub-agent, opens as a
+peek instead.
+
+The list refreshes once a second while it is open.</string>
+	<key>uidata</key>
+	<dict>
+		<key>94BB9498-18FF-42E7-98A7-017C3DF5C448</key>
+		<dict>
+			<key>xpos</key>
+			<real>80</real>
+			<key>ypos</key>
+			<real>70</real>
+		</dict>
+		<key>9A9F5B0B-7A30-4950-9829-3C1B5795B2A4</key>
+		<dict>
+			<key>xpos</key>
+			<real>320</real>
+			<key>ypos</key>
+			<real>70</real>
+		</dict>
+	</dict>
+	<key>version</key>
+	<string>1.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/vietdv277/alfred-herdr</string>
+</dict>
+</plist>
