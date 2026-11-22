@@ -169,7 +169,11 @@ Press &lt;kbd&gt;↩&lt;/kbd&gt; to jump to the chosen agent: Herdr comes to the
 space and tab and focuses its pane. An agent with no pane, such as a parked sub-agent, opens as a
 peek instead.
 
-The list refreshes once a second while it is open.</string>
+The list refreshes once a second while it is open.
+
+Type `hdp` to open a floating panel instead: a window listing the agents, refreshed every 2 s. It
+stays above other apps, remembers its position between launches and closes with &lt;kbd&gt;⎋&lt;/kbd&gt;.
+Clicking a row jumps to that agent the same way &lt;kbd&gt;↩&lt;/kbd&gt; does in `hd`.</string>
 	<key>uidata</key>
 	<dict>
 		<key>069BC4A1-5966-4CCD-9E38-89468A0D0D5D</key>
