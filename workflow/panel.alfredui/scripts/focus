@@ -1,0 +1,3 @@
+#!/bin/zsh
+# Row click: reuse the Script Filter's focus script.
+exec /bin/zsh ../scripts/focus.sh "$1"

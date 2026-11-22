@@ -1,0 +1,50 @@
+{
+  "bundleid": "com.vietdv277.alfred-herdr.panel",
+  "log": { "level": "info", "internal": false },
+  "pulse": {
+    "src": "scripts/pulse",
+    "interval": 2,
+    "intervalmode": "delay",
+    "now": true
+  },
+  "window": {
+    "id": "herdrPanel",
+    "title": "Herdr Agents",
+    "level": 3,
+    "frameautosave": true,
+    "movablebybackground": true,
+    "blur": true,
+    "fullscreenable": false,
+    "minimisable": false,
+    "toolbar": { "type": "unifiedcompact" },
+    "size": { "width": 380, "height": 460 },
+    "minsize": { "width": 260, "height": 160 },
+    "root": {
+      "type": "view",
+      "layout": "border",
+      "padding": 10,
+      "spacing": 8,
+      "shortcuts": [
+        { "shortcut": "⎋", "action": { "type": "function", "src": "herdrPanel", "args": "close" } }
+      ],
+      "components": [
+        {
+          "id": "summary",
+          "constraints": { "region": "top" },
+          "type": "label",
+          "colour": "secondaryLabelColor",
+          "text": "Loading…"
+        },
+        {
+          "id": "agents",
+          "constraints": { "region": "centre" },
+          "type": "view",
+          "layout": "inline",
+          "direction": "vertical",
+          "spacing": 6,
+          "components": []
+        }
+      ]
+    }
+  }
+}
