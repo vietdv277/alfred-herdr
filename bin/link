@@ -1,0 +1,16 @@
+#!/bin/sh
+# Symlink workflow/ into Alfred's workflows folder so edits are live. --unlink removes the link.
+set -eu
+src=$(cd "$(dirname "$0")/../workflow" && pwd -P)
+dst="$HOME/Library/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.alfred-herdr"
+
+if [ "${1:-}" = --unlink ]; then
+  [ -L "$dst" ] && rm "$dst" && echo "unlinked $dst"
+  exit 0
+fi
+if [ -e "$dst" ] && [ ! -L "$dst" ]; then
+  echo "bin/link: $dst exists and is not a link; leaving it" >&2
+  exit 1
+fi
+ln -sfn "$src" "$dst"
+echo "linked $dst -> $src"
