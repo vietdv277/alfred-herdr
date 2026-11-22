@@ -1,0 +1,19 @@
+#!/bin/sh
+# Stand-in for `hc` in bin/test: prints the fixture in $HC_FIXTURE for `ls --json`,
+# or fails with the message in $HC_FAIL so the "Herdr core is not running" paths run.
+set -u
+
+if [ -n "${HC_FAIL:-}" ]; then
+  echo "$HC_FAIL"
+  exit 1
+fi
+
+case "${1:-} ${2:-}" in
+  "ls --json")
+    cat "${HC_FIXTURE:?HC_FIXTURE is not set}"
+    ;;
+  *)
+    echo "fake-hc: unsupported call: $*" >&2
+    exit 2
+    ;;
+esac
