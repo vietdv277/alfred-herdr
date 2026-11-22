@@ -6,7 +6,7 @@ Alfred 6 workflow: see every Herdr app agent's status from anywhere on the Mac.
 
 - [x] **Agent list**: an Alfred keyword lists Herdr agents, blocked first, refreshing while open;
   Enter jumps to the agent in Herdr.
-- [ ] **Live panel**: an Alfred UI window that stays visible over any app and updates live.
+- [x] **Live panel**: an Alfred UI window that stays visible over any app and updates live.
 
 ## Usage
 
@@ -17,6 +17,10 @@ match the name, agent, space/tab, folder or status.
 Press <kbd>↩</kbd> to jump to the chosen agent: Herdr comes to the front, selects the agent's space
 and tab and focuses its pane. An agent with no pane, such as a parked sub-agent, opens as a peek
 instead. The list refreshes once a second while it is open.
+
+Type `hdp` to open a floating panel instead: a window listing the agents, refreshed every 2 s. It
+stays above other apps, remembers its position between launches and closes with <kbd>⎋</kbd>.
+Clicking a row jumps to that agent the same way <kbd>↩</kbd> does in `hd`.
 
 ## Requirements
 

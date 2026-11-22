@@ -20,8 +20,11 @@ out=$("$hc_bin" ls --json 2>&1) ||
 json=$(jq -c --arg q "$query" --arg home "$HOME" '
   def rank: if . == "blocked" then 0 elif . == "working" then 1
             elif . == "done" then 2 elif . == "idle" then 3 else 4 end;
-  def glyph: if . == "blocked" then "⛔" elif . == "working" then "⏳"
-             elif . == "done" then "✅" elif . == "idle" then "💤" else "·" end;
+  def iconpath: if . == "blocked" then "icons/blocked.png"
+                elif . == "working" then "icons/working.png"
+                elif . == "done" then "icons/done.png"
+                elif . == "idle" then "icons/idle.png"
+                else "icons/none.png" end;
   def statusword: if type == "string" and length > 0 then . else "no status" end;
   ($q | ascii_downcase | split(" ") | map(select(length > 0))) as $words
   | [.terminals[]
@@ -35,11 +38,12 @@ json=$(jq -c --arg q "$query" --arg home "$HOME" '
       | {rank: ($r.status | rank),
          hay: ([($r.name // ""), $r.agent, ($r.where // ""), $r.cwd, ($r.status // "")]
                | map(ascii_downcase) | join(" ")),
-         item: {title: (($r.status | glyph) + " " + ($r.name // $r.agent) + " — " + ($r.where // "")),
+         item: {title: (($r.name // $r.agent) + " — " + ($r.where // "")),
                 subtitle: (($r.status | statusword) + " · " + $r.agent
                            + " · turn " + ($r.turn | tostring) + " · " + $r.cwdshort
                            + (if $r.parent then " · under " + $r.parent else "" end)),
                 arg: $r.address,
+                icon: {path: ($r.status | iconpath)},
                 valid: true}})
   | to_entries
   | map(select(.value as $v | all($words[]; . as $w | ($v.hay | contains($w)))))

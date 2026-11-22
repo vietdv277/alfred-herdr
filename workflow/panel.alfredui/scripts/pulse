@@ -19,7 +19,8 @@ jq -c --arg home "$HOME" '
     | select(.state == "live")
     | select((.agent // "?") | test("^(zsh|bash|sh|fish|nvim|vim)$") | not)]
   | to_entries | sort_by((.value.status | rank), .key) | map(.value) as $rows
-  | ($rows | map(.status // "none") | group_by(.) | map("\(length) \(.[0])") | join(" · ")) as $counts
+  | ($rows | map(.status // "none") | group_by(.)
+     | sort_by((.[0] | rank)) | map("\(length) \(.[0])") | join(" · ")) as $counts
   | {update: {relayout: true, ids: {
       summary: {text: (if ($rows | length) == 0 then "No Herdr agents running" else $counts end)},
       agents: {components: [$rows[] | {
