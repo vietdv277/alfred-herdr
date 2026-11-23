@@ -22,7 +22,7 @@ reply=$("$hc_bin" connect 2>&1 <<<$request) ||
   fail "Herdr core is not running" "${reply:-$hc_bin connect failed}"
 
 # One JSON line per message; the reply to request id 1 carries the result.
-result=$(print -r -- "$reply" | jq -c 'first(select(.id == 1) | .result) // empty' 2>/dev/null) ||
+result=$(print -r -- "$reply" | jq -cRn 'first(inputs | fromjson? | objects | select(.id == 1) | .result) // empty' 2>/dev/null) ||
   fail "Herdr core is not running" "unexpected hc connect output: ${reply:0:160}"
 [[ -n $result ]] ||
   fail "Herdr core is not running" "${${reply:0:160}:-$hc_bin connect gave no reply}"

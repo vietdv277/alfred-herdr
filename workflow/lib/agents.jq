@@ -63,7 +63,7 @@ def agentrecords($home):
   [.terminals[]
    | . + {agent: (.status.app // ((.argv[0] // "/?") | split("/") | last))}
    | liveagent
-   | (.labels."herdr.seen" // null | if type == "string" then tonumber else . end) as $seen
+   | (.labels."herdr.seen" | if type == "number" then . elif type == "string" then (tonumber? // null) else null end) as $seen
    | (.turn // 0) as $turn
    | {address: .address, name: .name, agent: .agent, where: .labels.where,
       status: .status.state, msg: .status.msg, turn: $turn, cwd: (.cwd // ""),

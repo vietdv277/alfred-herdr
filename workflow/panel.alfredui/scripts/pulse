@@ -19,11 +19,11 @@ fail() {
 reply=$("$hc_bin" connect 2>&1 <<<$request) || fail "${reply:-$hc_bin connect failed}"
 
 # One JSON line per message; the reply to request id 1 carries the result.
-result=$(print -r -- "$reply" | jq -c 'first(select(.id == 1) | .result) // empty' 2>/dev/null) ||
+result=$(print -r -- "$reply" | jq -cRn 'first(inputs | fromjson? | objects | select(.id == 1) | .result) // empty' 2>/dev/null) ||
   fail "unexpected hc connect output: ${reply:0:160}"
 [[ -n $result ]] || fail "${${reply:0:160}:-$hc_bin connect gave no reply}"
 
-jq -c -L "$lib" --arg home "$HOME" --arg icons "$icons" --argjson now "$now" '
+out=$(jq -c -L "$lib" --arg home "$HOME" --arg icons "$icons" --argjson now "$now" '
   include "agents";
   agentrecords($home)
   | to_entries | attentionsort | map(.value) as $rows
@@ -39,4 +39,5 @@ jq -c -L "$lib" --arg home "$HOME" --arg icons "$icons" --argjson now "$now" '
         "title.text": "\(.name // .agent) — \(.where // "")",
         "sub.text": "\(statusline($now)) · \(.agent) · turn \(.turn) · \(.cwdshort)"
       }]}}
-    }}}' <<<"$result"
+    }}}' <<<"$result" 2>/dev/null) || fail "unexpected terminal.list result: ${result:0:160}"
+print -r -- "$out"
