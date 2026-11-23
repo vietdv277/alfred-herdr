@@ -7,15 +7,17 @@ Alfred 6 workflow: see every Herdr app agent's status from anywhere on the Mac.
 - [x] **Agent list**: an Alfred keyword lists Herdr agents, blocked first, refreshing while open;
   Enter jumps to the agent in Herdr.
 - [x] **Live panel**: an Alfred UI window that stays visible over any app and updates live.
-- [x] **Notifier**: a macOS banner when an agent turns blocked or done while Herdr is not in front.
+- [x] **Notifier**: a macOS banner when an agent turns blocked or done, or ends a turn in `idle`,
+  while Herdr is not in front.
 
 ## Usage
 
 Type `hd` in Alfred to list every agent running in the Herdr app in attention order: blocked, then
-`done` rows not yet looked at (marked `new`), working, `done` rows already seen, and idle. Within a
-group the newest status change comes first, and the subtitle gives its age (`done 3m`). Sub-agents
-sit under their parent. Type more words to narrow the list — all of them must match the name, agent,
-space/tab, folder or status.
+agents that finished a turn and have not been looked at yet (marked `new`; the status is `done`, or
+`idle` for agents such as OpenCode that never report `done`), working, finished turns already seen,
+and idle. Within a group the newest status change comes first, and the subtitle gives its age
+(`done 3m`). Sub-agents sit under their parent. Type more words to narrow the list — all of them
+must match the name, agent, space/tab, folder or status.
 
 Press <kbd>↩</kbd> to jump to the chosen agent: Herdr comes to the front, selects the agent's space
 and tab and focuses its pane. An agent with no pane, such as a parked sub-agent, opens as a peek
@@ -32,17 +34,18 @@ osascript -e 'tell application id "com.runningwithcrayons.Alfred" to run trigger
 ```
 
 Type `hdn`, or press <kbd>↩</kbd> on its one row, to jump straight to the agent that most needs
-attention: the newest blocked agent, or the newest `done` agent not yet seen. Agents already on
-screen in the current Herdr tab are skipped while Herdr is in front, so pressing `hdn` again
-steps to the next one. The
-workflow also carries an optional hotkey trigger for the same jump without the list. It ships
-unassigned; set a key on it in Alfred (for example Hyper+N, ⌃⌥⇧⌘N).
+attention: the newest blocked agent, or the newest agent that finished a turn and has not been seen
+yet — status `done`, or `idle` for agents such as OpenCode that never report `done`. Agents
+already on screen in the current Herdr tab are skipped while Herdr is in front, so pressing `hdn`
+again steps to the next one. The workflow also carries an optional hotkey trigger for the same jump
+without the list. It ships unassigned; set a key on it in Alfred (for example Hyper+N, ⌃⌥⇧⌘N).
 
 ## Notifier
 
-A background watcher posts one macOS banner the moment an agent turns `blocked` or `done` while
-Herdr is not the front app, so a finished run or a pending question is not missed from another
-window. Clicking the banner jumps to that agent, the same way <kbd>↩</kbd> does in `hd`.
+A background watcher posts one macOS banner the moment an agent turns `blocked` or `done`, or ends a
+turn in `idle` as OpenCode does, while Herdr is not the front app, so a finished run or a pending
+question is not missed from another window. Clicking the banner jumps to that agent, the same way
+<kbd>↩</kbd> does in `hd`.
 Transitions arriving together become a single banner naming the count, a status that only repeats
 itself — another `done` carrying a new message — stays quiet, and nothing is posted while Herdr is
 frontmost.
@@ -94,7 +97,8 @@ bin/install-notifier  # ~/Library/LaunchAgents/com.vietdv277.alfred-herdr.watch.
 `Herdr Agents` in System Settings › Notifications, and survives a rebuild under the same identity.
 
 The watcher logs to `~/Library/Logs/alfred-herdr-watch.log`. `hd` and `hdp` stay the place to see
-every agent at a glance; the banner interrupts only for those two states.
+every agent at a glance; the banner interrupts only for a block or a
+finished turn.
 
 ## Requirements
 

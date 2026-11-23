@@ -1,0 +1,2 @@
+{"channel":null,"seq":137,"terminals":[{"address":"t5s","name":"wire-ui","state":"live","cwd":"/Users/test/dev/ui","parent":null,"turn":4,"argv":["/bin/zsh","-l"],"status":{"app":"opencode","state":"working","msg":"Editing the panel"},"status_ms":1795363995000,"labels":{"herdr.seen":"4","where":"main · 1"}}]}
+{"jsonrpc":"2.0","method":"event","params":{"data":{"records":{},"reported":true,"status":{"app":"opencode","msg":"Waiting for the next prompt","state":"idle"}},"seq":138,"terminal":"t5s","type":"status"}}
