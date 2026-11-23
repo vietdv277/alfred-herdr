@@ -10,17 +10,10 @@ out=$("${HC:-hc}" ls --json 2>&1) || {
 }
 
 icons=${0:A:h:h:h}/icons
-jq -c --arg home "$HOME" --arg icons "$icons" '
-  def rank: {"blocked":0,"working":1,"done":2,"idle":3}[. // ""] // 4;
-  # same icons as hd: <icons>/<logo>-<status>.png, made by bin/make-icons
-  def logo: {"claude-code":"claude","claude":"claude","codex":"codex","opencode":"opencode",
-             "kiro-cli":"kiro","kiro":"kiro","gemini":"gemini","antigravity":"antigravity",
-             "agy":"antigravity"}[.] // "agent";
-  def iconpath($status): "\($icons)/\(logo)-\(if ["blocked","working","done","idle"]
-                                            | index([$status]) then $status else "none" end).png";
-  [.terminals[]
-    | select(.state == "live")
-    | select((.agent // "?") | test("^(zsh|bash|sh|fish|nvim|vim)$") | not)]
+lib=${0:A:h:h:h}/lib
+jq -c -L "$lib" --arg home "$HOME" --arg icons "$icons" '
+  include "agents";
+  agentrecords($home)
   | to_entries | sort_by((.value.status | rank), .key) | map(.value) as $rows
   | ($rows | map(.status // "none") | group_by(.)
      | sort_by((.[0] | rank)) | map("\(length) \(.[0])") | join(" · ")) as $counts
@@ -29,8 +22,8 @@ jq -c --arg home "$HOME" --arg icons "$icons" '
       agents: {data: {type: "basic", src: [$rows[] | {
         uid: .address,
         "icon.image": {type: "file", size: {width: 28, height: 28},
-                       src: (.status as $s | (.agent // "?") | iconpath($s))},
+                       src: (.status as $s | (.agent // "?") | iconpath($icons; $s))},
         "title.text": "\(.name // .agent) — \(.where // "")",
-        "sub.text": "\(.status // "no status") · \(.agent) · turn \(.turn // 0) · \((.cwd // "") | sub("^" + $home; "~"))"
+        "sub.text": "\(.status | statusword) · \(.agent) · turn \(.turn // 0) · \(.cwdshort)"
       }]}}
     }}}' <<<"$out"
