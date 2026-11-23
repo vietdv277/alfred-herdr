@@ -141,6 +141,61 @@ check_jump() { # check_jump <case> <fixture file|fail|rpc-error> <herdr-app ls f
   (( failed++ ))
 }
 
+# hdr: pick an agent, type a follow-up, and send it with ⌘↩.
+screens=$repo/tests/fixtures/screens
+
+check_hdr() { # check_hdr <case> <fixture file|fail|rpc-error> <query>
+  local case=$1 fixture=$2 query=$3 out want
+  local expected=tests/expected/$case.hdr.json
+  local -a env_vars
+  (( total++ ))
+
+  case $fixture in
+    fail) env_vars=(HC=$fake HC_FAIL=$hc_fail) ;;
+    rpc-error) env_vars=(HC=$fake HC_RPC_ERROR=1) ;;
+    *) env_vars=(HC=$fake HC_FIXTURE=$repo/tests/fixtures/$fixture) ;;
+  esac
+
+  out=$(env $env_vars HC_READ_DIR=$screens /bin/zsh workflow/scripts/reply.sh "$query")
+  want=$(<$expected)
+
+  if [[ $out == "$want" ]]; then
+    print -r -- "ok   $case.hdr"
+    return 0
+  fi
+
+  print -r -- "FAIL $case.hdr"
+  diff -u <(print -r -- $want | jq .) <(print -r -- $out | jq .) | sed 's/^/     /'
+  (( failed++ ))
+}
+
+check_send() { # check_send <case> <address> <name> <text> <want rc> [HC_SEND_FAIL]
+  local case=$1 addr=$2 name=$3 text=$4 wantrc=$5 sendfail=${6:-} out want rc=0
+  local expected=tests/expected/$case.send.log
+  local send_log=$repo/build/send-$case.send.log show_log=$repo/build/send-$case.show.log
+  (( total++ ))
+  mkdir -p $repo/build
+  : > $send_log
+  : > $show_log
+
+  env HC=$fake HC_SEND_LOG=$send_log HC_SEND_FAIL=$sendfail \
+      NOTIFY_SHOW_CMD=$fake_show NOTIFY_SHOW_LOG=$show_log \
+      reply_text="$text" reply_name="$name" \
+      /bin/zsh workflow/scripts/send.sh "$addr" || rc=$?
+
+  out=$( { sed 's/^/send: /' $send_log; sed 's/^/notify: /' $show_log } )
+  want=$(<$expected)
+
+  if (( rc == wantrc )) && [[ $out == "$want" ]]; then
+    print -r -- "ok   send.$case"
+    return 0
+  fi
+
+  print -r -- "FAIL send.$case (exit $rc, want $wantrc)"
+  diff -u <(print -r -- "$want") <(print -r -- "$out") | sed 's/^/     /'
+  (( failed++ ))
+}
+
 check_hdn queue queue.json -
 check_hdn idle-turns idle-turns.json -
 check_hdn done queue-done.json -
@@ -159,6 +214,22 @@ check_jump none empty.json -
 check_jump tab-all queue.json ls-tab-all.json
 HDN_FRONT=com.example.other check_jump background queue.json ls-tab-all.json
 check_jump core-down fail -
+
+check_hdr pick reply-pick.json ""
+check_hdr pick-query reply-pick.json "main"
+check_hdr nomatch reply-pick.json "zzz"
+check_hdr reply reply.json "dev > check the log and rerun the entire suite with verbose output once"
+check_hdr reply-empty reply.json "dev >"
+check_hdr reply-empty-space reply.json "dev > "
+check_hdr reply-again reply.json "dev > a > b"
+check_hdr reply-many reply-many.json "batch > go"
+check_hdr reply-nomatch reply.json "zzz > hi"
+check_hdr fail fail "dev > hi"
+check_hdr rpc-error rpc-error "dev > hi"
+
+check_send sent r-done fresh-done 'say "hi" $HOME `x` -n' 0
+check_send not-sent r-blocked gate-check "hi" 1 "agent is blocked"
+check_send nothing r-done fresh-done "" 0
 
 # The watcher: one `hc events` stream from tests/fixtures/events-*.jsonl through a fake notify
 # that records every banner, diffed against the recorded arguments.

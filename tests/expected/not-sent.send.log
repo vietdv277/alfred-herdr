@@ -1,0 +1,2 @@
+send: {"addr":"r-blocked","text":"hi","argc":2}
+notify: Not sent to gate-check: agent is blocked

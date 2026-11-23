@@ -1,9 +1,11 @@
 #!/bin/sh
 # Stand-in for `hc` in bin/test: answers `connect` with the fixture in $HC_FIXTURE as the
 # terminal.list result, fails with the message in $HC_FAIL so the "Herdr core is not running"
-# paths run, or answers an error reply when $HC_RPC_ERROR is set. `events` replays the event stream
-# in $HC_EVENTS line by line, sleeping $HC_EVENTS_DELAY seconds before each line, and exits the way
-# `hc events --json` does when the core stops.
+# paths run, or answers an error reply when $HC_RPC_ERROR is set. `read` prints the screen in
+# $HC_READ_DIR/<address>.json or fails, `send` records its argv in $HC_SEND_LOG and fails with
+# $HC_SEND_FAIL, and `events` replays the event stream in $HC_EVENTS line by line, sleeping
+# $HC_EVENTS_DELAY seconds before each line, and exits the way `hc events --json` does when the
+# core stops.
 set -u
 
 if [ -n "${HC_FAIL:-}" ]; then
@@ -22,6 +24,30 @@ case "${1:-}" in
       printf '%s\n' '{"jsonrpc":"2.0","id":1,"error":{"code":-32601,"message":"unknown method"}}'
     else
       printf '{"jsonrpc":"2.0","id":1,"result":%s}\n' "$(jq -c . "${HC_FIXTURE:?HC_FIXTURE is not set}")"
+    fi
+    ;;
+  read)
+    # A screen per address, so a case can leave one out and make the preview fail.
+    addr=${2:-}
+    if [ -n "${HC_READ_DIR:-}" ] && [ -f "$HC_READ_DIR/$addr.json" ]; then
+      cat "$HC_READ_DIR/$addr.json"
+    else
+      echo "fake-hc: no screen for ${addr:-?}" >&2
+      exit 1
+    fi
+    ;;
+  send)
+    # One JSON line per call: every argv after `send`, so a stray --force shows up in argc.
+    if [ -z "${HC_SEND_LOG:-}" ]; then
+      echo "fake-hc: HC_SEND_LOG is not set" >&2
+      exit 2
+    fi
+    shift
+    jq -cn --arg addr "${1:-}" --arg text "${2:-}" --argjson argc "$#" \
+      '{addr: $addr, text: $text, argc: $argc}' >> "$HC_SEND_LOG"
+    if [ -n "${HC_SEND_FAIL:-}" ]; then
+      echo "$HC_SEND_FAIL"
+      exit 1
     fi
     ;;
   events)
