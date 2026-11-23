@@ -231,6 +231,7 @@ if out=$({ staged=$(bin/stage-notifier build/runtime) &&
       "[\"/bin/zsh\",\"$repo/build/runtime/workflow/scripts/watch\"]" ]] &&
    cmp -s workflow/scripts/focus.sh build/runtime/workflow/scripts/focus.sh &&
    cmp -s workflow/lib/notify.jq build/runtime/workflow/lib/notify.jq &&
+   cmp -s workflow/lib/notify.zsh build/runtime/workflow/lib/notify.zsh &&
    ! bin/stage-notifier "$HOME/Documents/alfred-herdr-test" 2>/dev/null &&
    [[ ! -e $HOME/Documents/alfred-herdr-test ]]; then
   print -r -- "ok   notifier.launchagent"
