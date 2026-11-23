@@ -1,0 +1,2 @@
+{"channel":null,"seq":137,"terminals":[{"address":"t4s","name":"-x \"quoted\" $HOME","state":"live","cwd":"/Users/test/dev/$tmp","parent":null,"turn":1,"argv":["/bin/zsh","-l"],"status":{"app":"claude-code","state":"working","msg":"$SHELL and $(id) are text"},"status_ms":1795363900000,"labels":{"herdr.seen":"1","where":"main · 3"}}]}
+{"jsonrpc":"2.0","method":"event","params":{"data":{"records":{},"reported":true,"status":{"app":"claude-code","msg":"passed \"2\" $x","state":"done"}},"seq":138,"terminal":"t4s","type":"status"}}

@@ -31,6 +31,10 @@ final class Helper: NSObject, NSApplicationDelegate, UNUserNotificationCenterDel
   }
 
   private func post() {
+    // An unanswered permission prompt would hang the watcher's post forever.
+    DispatchQueue.global().asyncAfter(deadline: .now() + 30) {
+      self.fail("post timed out after 30 s", 4)
+    }
     let center = UNUserNotificationCenter.current()
     center.requestAuthorization(options: [.alert, .sound]) { granted, error in
       guard granted else {

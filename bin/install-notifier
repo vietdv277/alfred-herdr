@@ -1,19 +1,22 @@
 #!/bin/zsh
-# Write the watcher's LaunchAgent from the template and start it. Run bin/build-notifier first:
-# the watcher posts through the app bundle, not through this script.
+# Write the watcher's LaunchAgent and start it. Run bin/build-notifier first: the watcher posts
+# through the app bundle, not through this script.
 set -eu
 cd "${0:A:h}/.."
-root=$PWD
 
 label=com.vietdv277.alfred-herdr.watch
-watch=$root/workflow/scripts/watch
-log=$HOME/Library/Logs/alfred-herdr-watch.log
+domain=gui/$(id -u)
 target=$HOME/Library/LaunchAgents/$label.plist
 
 mkdir -p "$HOME/Library/LaunchAgents"
-sed -e "s|@WATCH@|$watch|g" -e "s|@LOG@|$log|g" \
-  notifier/$label.plist > "$target"
+bin/make-watch-plist "$target" >/dev/null
 
-launchctl bootout "gui/$(id -u)/$label" 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" "$target"
+launchctl bootout "$domain/$label" 2>/dev/null || true
+# bootout returns before the job is gone, and bootstrap fails while the old one is still loaded.
+for _ in {1..50}; do
+  launchctl print "$domain/$label" >/dev/null 2>&1 || break
+  sleep 0.1 </dev/null
+done
+launchctl bootstrap "$domain" "$target"
+
 print -r -- "installed $target"

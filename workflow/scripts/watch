@@ -25,12 +25,12 @@ front=()
 
 front_bundle() {
   if (( ${#front} )); then
-    "${front[@]}" 2>/dev/null
+    "${front[@]}" </dev/null 2>/dev/null
     return
   fi
   local id
-  id=$(lsappinfo front 2>/dev/null) || return 1
-  lsappinfo info -only bundleID "$id" 2>/dev/null |
+  id=$(lsappinfo front </dev/null 2>/dev/null) || return 1
+  lsappinfo info -only bundleID "$id" </dev/null 2>/dev/null |
     sed -n 's/.*bundleID[^=]*="\([^"]*\)".*/\1/p'
 }
 
@@ -53,7 +53,8 @@ post_batch() {
   address=$(jq -r .address <<<"$summary")
 
   [[ $(front_bundle) == dev.herdr.app ]] && return 0
-  "${notify[@]}" post --title "$title" --body "$body" --address "$address" --exec "$focus" ||
+  "${notify[@]}" post --title "$title" --body "$body" --address "$address" --exec "$focus" \
+    </dev/null ||
     print -r -- "watch: post failed: $title" >&2
 }
 
@@ -78,6 +79,6 @@ while true; do
   (( once )) && break
   # A stream that lived over a minute was healthy, so the next reconnect starts short again.
   (( SECONDS - started > 60 )) && delay=2
-  sleep $delay
-  (( delay = delay < 30 ? delay * 2 : 30 ))
+  sleep $delay </dev/null
+  (( delay = delay * 2 > 30 ? 30 : delay * 2 ))
 done

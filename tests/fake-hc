@@ -1,8 +1,9 @@
 #!/bin/sh
 # Stand-in for `hc` in bin/test: answers `connect` with the fixture in $HC_FIXTURE as the
 # terminal.list result, fails with the message in $HC_FAIL so the "Herdr core is not running"
-# paths run, or answers an error reply when $HC_RPC_ERROR is set. `events` copies the event stream
-# in $HC_EVENTS to stdout and exits, the way `hc events --json` ends when the core stops.
+# paths run, or answers an error reply when $HC_RPC_ERROR is set. `events` replays the event stream
+# in $HC_EVENTS line by line, sleeping $HC_EVENTS_DELAY seconds before each line, and exits the way
+# `hc events --json` does when the core stops.
 set -u
 
 if [ -n "${HC_FAIL:-}" ]; then
@@ -28,7 +29,15 @@ case "${1:-}" in
       echo "fake-hc: HC_EVENTS is not set" >&2
       exit 2
     fi
-    cat "$HC_EVENTS"
+    delay=${HC_EVENTS_DELAY:-0}
+    first=1
+    while IFS= read -r line; do
+      if [ -z "$first" ]; then
+        [ "$delay" = 0 ] || sleep "$delay" </dev/null
+      fi
+      first=
+      printf '%s\n' "$line"
+    done < "$HC_EVENTS"
     ;;
   *)
     echo "fake-hc: unsupported call: $*" >&2

@@ -71,14 +71,14 @@ check rpc-error rpc-error "" hdp
 fake_notify=$repo/tests/fake-notify
 focus_sh=$repo/workflow/scripts/focus.sh
 
-check_notify() { # check_notify <case> <events fixture> <bundle id in front>
-  local case=$1 fixture=$2 front=$3 out want rc=0
+check_notify() { # check_notify <case> <events fixture> <bundle id in front> [seconds between lines]
+  local case=$1 fixture=$2 front=$3 delay=${4:-} out want rc=0
   local expected=tests/expected/notify-$case.log
   (( total++ ))
   mkdir -p $repo/build
   : > $repo/build/notify-$case.log
 
-  env HC=$fake HC_EVENTS=$repo/tests/fixtures/$fixture \
+  env HC=$fake HC_EVENTS=$repo/tests/fixtures/$fixture HC_EVENTS_DELAY=$delay \
       NOTIFY_LOG=$repo/build/notify-$case.log NOTIFY_CMD=$fake_notify \
       HERDR_FRONT_CMD="print -r -- $front" WATCH_ONCE=1 \
       /bin/zsh workflow/scripts/watch || rc=$?
@@ -109,8 +109,39 @@ check_notify shell events-shell.jsonl com.example.other
 check_notify unknown events-unknown.jsonl com.example.other
 check_notify snapshot events-snapshot.jsonl com.example.other
 check_notify batch events-batch.jsonl com.example.other
+check_notify spaced events-batch.jsonl com.example.other 2
+check_notify quoted events-quoted.jsonl com.example.other
 check_notify front events-done.jsonl dev.herdr.app
 check_notify noise events-noise.jsonl com.example.other
+
+# A post that fails must be reported on stderr and must not end the watcher.
+(( total++ ))
+: > $repo/build/notify-failpost.log
+: > $repo/build/notify-failpost.err
+rc=0
+env HC=$fake HC_EVENTS=$repo/tests/fixtures/events-done.jsonl \
+    NOTIFY_LOG=$repo/build/notify-failpost.log NOTIFY_CMD=$repo/tests/fail-notify \
+    HERDR_FRONT_CMD="print -r -- com.example.other" WATCH_ONCE=1 \
+    /bin/zsh workflow/scripts/watch 2>$repo/build/notify-failpost.err || rc=$?
+if (( rc == 0 )) && grep -q 'post failed' $repo/build/notify-failpost.err; then
+  print -r -- "ok   notify.failpost"
+else
+  print -r -- "FAIL notify.failpost (exit $rc)"
+  sed 's/^/     /' $repo/build/notify-failpost.err
+  (( failed++ ))
+fi
+
+# The install script's generation step, without launchctl.
+(( total++ ))
+if out=$(bin/make-watch-plist build/watch-launchagent.plist 2>&1) &&
+   [[ $(plutil -extract ProgramArguments json -o - build/watch-launchagent.plist | jq -c .) ==
+      "[\"/bin/zsh\",\"$repo/workflow/scripts/watch\"]" ]]; then
+  print -r -- "ok   notifier.launchagent"
+else
+  print -r -- "FAIL notifier.launchagent"
+  print -r -- "$out" | sed 's/^/     /'
+  (( failed++ ))
+fi
 
 if (( $+commands[swiftc] )); then
   (( total++ ))
