@@ -4,7 +4,7 @@
 set -u
 
 # Alfred runs scripts with a minimal PATH.
-PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 addr=${1-}
 text=${reply_text-}
 name=${reply_name:-$addr}

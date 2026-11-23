@@ -5,7 +5,7 @@
 set -u
 
 # A LaunchAgent starts with a minimal PATH.
-PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 hc_bin=${HC:-hc}
 here=${0:A:h}
 root=${here:h:h}

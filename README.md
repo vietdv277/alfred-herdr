@@ -2,6 +2,8 @@
 
 Alfred 6 workflow: see every [Herdr](https://herdr.dev/) app agent's status from anywhere on the Mac.
 
+![Agent list](workflow/images/hda.png)
+
 ## Features
 
 - [x] **Agent list**: an Alfred keyword lists Herdr agents, blocked first, refreshing while open;
@@ -47,7 +49,8 @@ pick the agent to get its `> ` prefix, then type the message after it. <kbd>⌘�
 message and <kbd>↩</kbd> only switches to that agent. A blocked agent takes no message; answer it in
 Herdr first.
 
-The four keywords are defaults and can be changed in Alfred's Configure Workflow sheet.
+No configuration is needed. The four keywords are defaults and can be changed in Alfred's Configure
+Workflow sheet.
 
 ## Notifier
 
@@ -149,6 +152,9 @@ The agent logos in `assets/agents/` and `workflow/icons/` come from LobeHub icon
 agent a row is. The two licenses sit beside the sources as
 `assets/agents/LICENSE-LobeHub.txt` and `assets/agents/LICENSE-Lucide.txt`, and ship inside the
 packaged workflow.
+
+Built with the help of AI coding tools (Claude Code and OpenCode); every change was reviewed and
+tested before release.
 
 ## License
 
