@@ -4,7 +4,7 @@
 set -u
 
 # Alfred runs scripts with a minimal PATH.
-PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 query=${1-}
 lib=${0:A:h:h}/lib
 # Age in subtitles is measured from here; a fixed value keeps tests deterministic.

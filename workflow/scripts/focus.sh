@@ -4,7 +4,7 @@
 set -u
 
 # Alfred runs scripts with a minimal PATH.
-PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 app_bin=${HERDR_APP:-herdr-app}
 addr=${1-}
 source "${0:A:h:h}/lib/notify.zsh"
