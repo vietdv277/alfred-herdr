@@ -1,0 +1,39 @@
+#!/bin/zsh
+# Build Herdr-Agents.alfredworkflow from the committed workflow/ tree, never the working copy, so
+# a hotkey set locally in Alfred never ships. The licenses ride along at the archive root.
+# PACKAGE_OUT sets the output directory (default build/), PACKAGE_REF the git ref to package.
+set -eu
+cd "${0:A:h}/.."
+
+ref=${PACKAGE_REF:-HEAD}
+out=${PACKAGE_OUT:-build}
+name=Herdr-Agents.alfredworkflow
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+git archive --format=tar "$ref":workflow | tar -x -C "$work"
+for pair in LICENSE:LICENSE assets/agents/LICENSE-LobeHub.txt:LICENSE-LobeHub.txt \
+            assets/agents/LICENSE-Lucide.txt:LICENSE-Lucide.txt; do
+  git show "${ref}:${pair%%:*}" > "$work/${pair##*:}" ||
+    { print -r -- "package: ${pair%%:*} is missing from $ref" >&2; exit 1 }
+done
+
+plist=$work/info.plist
+[[ -f $plist ]] || { print -r -- "package: $ref:workflow has no info.plist" >&2; exit 1 }
+
+# A key assigned in Alfred would ship the publisher's hotkey to every install.
+assigned=$(plutil -convert json -o - "$plist" | jq -c '
+  [.objects[] | select(.type == "alfred.workflow.trigger.hotkey")
+   | select((.config.hotkey // 0) != 0 or (.config.hotmod // 0) != 0)] | length')
+if [[ $assigned != 0 ]]; then
+  print -r -- "package: $assigned hotkey trigger(s) in info.plist carry a key; clear them in Alfred first" >&2
+  exit 1
+fi
+
+mkdir -p "$out"
+target=${out:A}/$name
+rm -f "$target"
+(cd "$work" && zip -qrX "$target" .)
+
+print -r -- "$target"
+print -r -- "version: $(plutil -extract version raw -o - "$plist")"

@@ -7,8 +7,9 @@ Alfred 6 workflow: see every Herdr app agent's status from anywhere on the Mac.
 - [x] **Agent list**: an Alfred keyword lists Herdr agents, blocked first, refreshing while open;
   Enter jumps to the agent in Herdr.
 - [x] **Live panel**: an Alfred UI window that stays visible over any app and updates live.
-- [x] **Notifier**: a macOS banner when an agent turns blocked or done, or ends a turn in `idle`,
-  while Herdr is not in front.
+- [x] **Notifier** (optional, set up from a source checkout; not part of the packaged workflow): a
+  macOS banner when an agent turns blocked or done, or ends a turn in `idle`, while Herdr is not in
+  front.
 - [x] **Quick reply**: a follow-up prompt sent to a finished agent without opening Herdr.
 
 ## Usage
@@ -55,6 +56,9 @@ question is not missed from another window. Clicking the banner jumps to that ag
 Transitions arriving together become a single banner naming the count, a status that only repeats
 itself — another `done` carrying a new message — stays quiet, and nothing is posted while Herdr is
 frontmost.
+
+The notifier is optional and is set up from a source checkout; it is not part of the packaged
+workflow.
 
 ### One-time setup
 
@@ -108,14 +112,21 @@ finished turn.
 
 ## Requirements
 
-- Alfred 6 with the Powerpack, macOS 12+.
-- The Herdr desktop app with `hc` and `herdr-app` on this machine.
+- Alfred 6 with the Powerpack.
+- The Herdr app, opened once from Applications (it links `herdr-app` into `~/.local/bin`), and
+  Herdr Core (`hc`, also in `~/.local/bin`).
+- jq: built into macOS 15 and later; on macOS 12–14 install it with Homebrew.
+
+## Install
+
+Download `Herdr-Agents.alfredworkflow` from the GitHub Releases page and open it.
 
 ## Install (development)
 
 ```sh
 bin/link        # symlinks workflow/ into Alfred's workflows folder
 bin/make-icons  # re-renders workflow/icons/ from assets/agents/*.svg (rsvg-convert, magick)
+bin/package     # builds build/Herdr-Agents.alfredworkflow from the committed workflow/ tree
 ```
 
 `bin/test` replays `tests/fixtures` through a fake `hc` and diffs `hd`, `hdp`, `hdn` and `hdr`
@@ -127,3 +138,16 @@ installed.
 
 The agent logos in `assets/agents/` are the ones the Herdr app shows; each `hd` row combines its
 agent's logo with a status dot. An agent without a logo gets the generic `agent` icon.
+
+## Credits
+
+The agent logos in `assets/agents/` and `workflow/icons/` come from LobeHub icons
+(<https://github.com/lobehub/lobe-icons>, MIT); `agent.svg` is Lucide's `bot` icon
+(<https://lucide.dev>, ISC). Product names and logos belong to their owners and only label which
+agent a row is. The two licenses sit beside the sources as
+`assets/agents/LICENSE-LobeHub.txt` and `assets/agents/LICENSE-Lucide.txt`, and ship inside the
+packaged workflow.
+
+## License
+
+MIT, see `LICENSE`.

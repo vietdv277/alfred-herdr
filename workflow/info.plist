@@ -434,7 +434,14 @@ unassigned until a key is set on it in Alfred.
 Type `hdr` to send a follow-up prompt to an agent without opening Herdr:
 `hdr &lt;agent&gt; &gt; &lt;message&gt;`. &lt;kbd&gt;⌘↩&lt;/kbd&gt; sends the message and &lt;kbd&gt;↩&lt;/kbd&gt;
 only switches to the agent. Only an agent that finished its turn (`done` or `idle`) takes a
-message; a blocked one has to be answered in Herdr first.</string>
+message; a blocked one has to be answered in Herdr first.
+
+## Requirements
+
+- Alfred 6 with the Powerpack.
+- The Herdr app, opened once from Applications (it links `herdr-app` into `~/.local/bin`), and
+  Herdr Core (`hc`, also in `~/.local/bin`).
+- jq: built into macOS 15 and later; on macOS 12–14 install it with Homebrew.</string>
 	<key>uidata</key>
 	<dict>
 		<key>069BC4A1-5966-4CCD-9E38-89468A0D0D5D</key>
@@ -509,7 +516,7 @@ message; a blocked one has to be answered in Herdr first.</string>
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>1.0</string>
+	<string>1.0.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/vietdv277/alfred-herdr</string>
 </dict>
