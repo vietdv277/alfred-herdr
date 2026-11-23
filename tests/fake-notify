@@ -1,0 +1,11 @@
+#!/bin/sh
+# Stand-in for the notification helper in bin/test: records the argv of every call as one JSON
+# array line in $NOTIFY_LOG instead of showing a banner.
+set -u
+
+if [ -z "${NOTIFY_LOG:-}" ]; then
+  echo "fake-notify: NOTIFY_LOG is not set" >&2
+  exit 2
+fi
+
+jq -cn '$ARGS.positional' --args -- "$@" >> "$NOTIFY_LOG"

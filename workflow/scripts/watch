@@ -1,0 +1,83 @@
+#!/bin/zsh
+# Long-running watcher: one banner when an agent turns blocked or done while Herdr is not in front.
+# Reconnects to `hc events` with a backoff, and turns a burst of transitions into one banner.
+set -u
+
+# A LaunchAgent starts with a minimal PATH.
+PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+hc_bin=${HC:-hc}
+here=${0:A:h}
+root=${here:h:h}
+lib=$root/workflow/lib
+focus=$root/workflow/scripts/focus.sh
+notify_app=${NOTIFY_APP:-$HOME/Applications/Herdr Agents.app}
+once=${WATCH_ONCE:-0}
+
+# The helper is a bundle, so macOS only delivers its banners when LaunchServices starts it.
+if [[ -n ${NOTIFY_CMD:-} ]]; then
+  notify=(${=NOTIFY_CMD})
+else
+  notify=(open -n -g "$notify_app" --args)
+fi
+# Prints a bundle id; the tests replace it with a fixed one.
+front=()
+[[ -n ${HERDR_FRONT_CMD:-} ]] && front=(${=HERDR_FRONT_CMD})
+
+front_bundle() {
+  if (( ${#front} )); then
+    "${front[@]}" 2>/dev/null
+    return
+  fi
+  local id
+  id=$(lsappinfo front 2>/dev/null) || return 1
+  lsappinfo info -only bundleID "$id" 2>/dev/null |
+    sed -n 's/.*bundleID[^=]*="\([^"]*\)".*/\1/p'
+}
+
+# One banner for a batch of alert records: the record itself, or the count of them with the
+# blocked agents named first.
+post_batch() {
+  local summary title body address
+  summary=$(print -rC1 -- "$@" | jq -c -s '
+    to_entries
+    | sort_by([(if .value.state == "blocked" then 0 else 1 end), .key])
+    | map(.value) as $a
+    | if ($a | length) == 1 then $a[0] | {title, body, address}
+      else {title: "\($a | length) agents need attention",
+            body: ($a | map(.title) | join(", ")), address: $a[0].address} end') || {
+    print -r -- "watch: unreadable alert batch" >&2
+    return 1
+  }
+  title=$(jq -r .title <<<"$summary")
+  body=$(jq -r .body <<<"$summary")
+  address=$(jq -r .address <<<"$summary")
+
+  [[ $(front_bundle) == dev.herdr.app ]] && return 0
+  "${notify[@]}" post --title "$title" --body "$body" --address "$address" --exec "$focus" ||
+    print -r -- "watch: post failed: $title" >&2
+}
+
+# Alerts arrive one line at a time; the rest of a burst follows within 1.5 s of the first.
+stream() {
+  "$hc_bin" events --json |
+    jq -Rn --unbuffered -L "$lib" --arg home "$HOME" \
+      'include "agents"; include "notify"; alerts(agentrecords($home))' |
+    while IFS= read -r line; do
+      local -a batch=("$line")
+      while IFS= read -r -t 1.5 more; do
+        batch+=("$more")
+      done
+      post_batch "${batch[@]}"
+    done
+}
+
+delay=2
+while true; do
+  started=$SECONDS
+  stream
+  (( once )) && break
+  # A stream that lived over a minute was healthy, so the next reconnect starts short again.
+  (( SECONDS - started > 60 )) && delay=2
+  sleep $delay
+  (( delay = delay < 30 ? delay * 2 : 30 ))
+done

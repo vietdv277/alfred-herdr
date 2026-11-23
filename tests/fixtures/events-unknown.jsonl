@@ -1,0 +1,2 @@
+{"channel":null,"seq":137,"terminals":[{"address":"t1s","name":"api-refactor","state":"live","cwd":"/Users/test/dev/shop","parent":null,"turn":3,"argv":["/bin/zsh","-l"],"status":{"app":"claude-code","state":"working","msg":"Running tests"},"status_ms":1795363995000,"labels":{"herdr.seen":"3","where":"main · 1"}}]}
+{"jsonrpc":"2.0","method":"event","params":{"data":{"records":{},"reported":true,"status":{"app":"codex","msg":"Waiting for input","state":"blocked"}},"seq":138,"terminal":"t7s","type":"status"}}

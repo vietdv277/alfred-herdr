@@ -66,6 +66,63 @@ check fail fail "" hdp
 check rpc-error rpc-error "" hd
 check rpc-error rpc-error "" hdp
 
+# The watcher: one `hc events` stream from tests/fixtures/events-*.jsonl through a fake notify
+# that records every banner, diffed against the recorded arguments.
+fake_notify=$repo/tests/fake-notify
+focus_sh=$repo/workflow/scripts/focus.sh
+
+check_notify() { # check_notify <case> <events fixture> <bundle id in front>
+  local case=$1 fixture=$2 front=$3 out want rc=0
+  local expected=tests/expected/notify-$case.log
+  (( total++ ))
+  mkdir -p $repo/build
+  : > $repo/build/notify-$case.log
+
+  env HC=$fake HC_EVENTS=$repo/tests/fixtures/$fixture \
+      NOTIFY_LOG=$repo/build/notify-$case.log NOTIFY_CMD=$fake_notify \
+      HERDR_FRONT_CMD="print -r -- $front" WATCH_ONCE=1 \
+      /bin/zsh workflow/scripts/watch || rc=$?
+
+  if (( rc != 0 )); then
+    print -r -- "FAIL notify.$case (watch exited $rc)"
+    (( failed++ ))
+    return 1
+  fi
+
+  out=$(<$repo/build/notify-$case.log)
+  out=${out//$focus_sh/@FOCUS@}
+  want=$(<$expected)
+
+  if [[ $out == "$want" ]]; then
+    print -r -- "ok   notify.$case"
+    return 0
+  fi
+
+  print -r -- "FAIL notify.$case"
+  diff -u <(print -r -- "$want") <(print -r -- "$out") | sed 's/^/     /'
+  (( failed++ ))
+}
+
+check_notify done events-done.jsonl com.example.other
+check_notify repeat events-repeat.jsonl com.example.other
+check_notify shell events-shell.jsonl com.example.other
+check_notify unknown events-unknown.jsonl com.example.other
+check_notify snapshot events-snapshot.jsonl com.example.other
+check_notify batch events-batch.jsonl com.example.other
+check_notify front events-done.jsonl dev.herdr.app
+check_notify noise events-noise.jsonl com.example.other
+
+if (( $+commands[swiftc] )); then
+  (( total++ ))
+  if out=$(swiftc -typecheck notifier/HerdrNotify.swift 2>&1); then
+    print -r -- "ok   notifier.typecheck"
+  else
+    print -r -- "FAIL notifier.typecheck"
+    print -r -- "$out" | sed 's/^/     /'
+    (( failed++ ))
+  fi
+fi
+
 if (( failed > 0 )); then
   print -r -- "$failed of $total cases failed"
   exit 1

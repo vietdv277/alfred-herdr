@@ -1,0 +1,19 @@
+#!/bin/zsh
+# Write the watcher's LaunchAgent from the template and start it. Run bin/build-notifier first:
+# the watcher posts through the app bundle, not through this script.
+set -eu
+cd "${0:A:h}/.."
+root=$PWD
+
+label=com.vietdv277.alfred-herdr.watch
+watch=$root/workflow/scripts/watch
+log=$HOME/Library/Logs/alfred-herdr-watch.log
+target=$HOME/Library/LaunchAgents/$label.plist
+
+mkdir -p "$HOME/Library/LaunchAgents"
+sed -e "s|@WATCH@|$watch|g" -e "s|@LOG@|$log|g" \
+  notifier/$label.plist > "$target"
+
+launchctl bootout "gui/$(id -u)/$label" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$target"
+print -r -- "installed $target"
