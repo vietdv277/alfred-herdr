@@ -413,7 +413,7 @@
 	<key>readme</key>
 	<string>## Usage
 
-See and jump to every agent running in the Herdr app, from anywhere on the Mac.
+See and jump to every agent running in the [Herdr](https://herdr.dev/) app, from anywhere on the Mac.
 
 List every agent and jump to one via the `hda` keyword.
 
