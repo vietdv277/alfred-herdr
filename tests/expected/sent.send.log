@@ -1,0 +1,2 @@
+send: {"addr":"r-done","text":"say \"hi\" $HOME `x` -n","argc":2}
+notify: Sent to fresh-done: say "hi" $HOME `x` -n

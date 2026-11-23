@@ -74,6 +74,9 @@ def agentrecords($home):
    | $r + {cwdshort: ($r.cwd | cwdshort($home)),
            class: ($r.status | attentionclass($r.unseen))}];
 
+# Text shortened to $n characters for a one-line summary; the ellipsis marks the cut.
+def cut($n): if length > $n then .[:$n] + "…" else . end;
+
 # One row as hd prints it, so hdn lands on the same title, subtitle and icon.
 def hdrow($now):
   . as $r
@@ -84,6 +87,37 @@ def hdrow($now):
      arg: $r.address,
      icon: {path: ($r.agent | iconpath("icons"; $r.status))},
      valid: true};
+
+# hdr before the message is typed: the agent as hd shows it, and its `hdr <agent> > ` prefix.
+def replypick($now):
+  . as $r
+  | ($r | hdrow($now)) as $hd
+  | {title: $hd.title, subtitle: $hd.subtitle, icon: $hd.icon,
+     autocomplete: (($r.name // $r.address) + " > "), valid: false};
+
+# hdr once the message is typed: a finished turn takes it, and any other status only switches to
+# the agent, because a blocked agent has to answer its own dialog first.
+def replyrow($now; $text):
+  . as $r
+  | ($r | hdrow($now)) as $hd
+  | (if $r.name != null and $r.where != null then $r.name + " — " + $r.where
+     else $hd.title end) as $who
+  | if $text == "" then
+      {title: "Type the message after >", subtitle: $hd.subtitle, icon: $hd.icon, valid: false,
+       mods: {cmd: {valid: false, subtitle: "Type the message after >"}}}
+    elif $r.status == "done" or $r.status == "idle" then
+      {title: ("Send to " + $who + ": " + ($text | cut(60))),
+       subtitle: "⌘↩ send · ↩ switch to it",
+       arg: $r.address, icon: $hd.icon, valid: true,
+       mods: {cmd: {valid: true, arg: $r.address, subtitle: "Send this message",
+                    variables: {reply_text: $text, reply_name: ($r.name // $r.agent)}}}}
+    else
+      (if $r.status == "blocked" then "blocked — switch to answer it"
+       elif $r.status == "working" then "working — wait for it to finish"
+       else "no status — cannot tell if it is ready" end) as $note
+      | {title: $hd.title, subtitle: $note, arg: $r.address, icon: $hd.icon, valid: true,
+         mods: {cmd: {valid: false, subtitle: $note}}}
+    end;
 
 # The agents that need attention: blocked, then done or idle and unseen, in attention order.
 # Working, done or idle and seen, and no-status agents never need it.

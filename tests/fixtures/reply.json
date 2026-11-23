@@ -1,0 +1,33 @@
+{
+  "terminals": [
+    {"address": "r-blocked", "name": "gate-check", "state": "live", "cwd": "/Users/test/dev/api",
+     "parent": null, "turn": 3, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "1.4.2", "argv": ["kiro-cli"]},
+     "status": {"app": "kiro-cli", "state": "blocked"},
+     "status_ms": 1795363995000,
+     "labels": {"herdr.seen": "3", "where": "main · 2"}},
+    {"address": "r-working", "name": "build-watch", "state": "live", "cwd": "/Users/test/dev/app",
+     "parent": null, "turn": 2, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "2.1.330", "argv": ["claude"]},
+     "status": {"app": "claude-code", "state": "working", "msg": "Running the tests"},
+     "status_ms": 1795363999000,
+     "labels": {"herdr.seen": "2", "where": "main · 3"}},
+    {"address": "r-done", "name": "fresh-done", "state": "live", "cwd": "/Users/test/dev/docs",
+     "parent": null, "turn": 7, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "1.9.0", "argv": ["codex"]},
+     "status": {"app": "codex", "state": "done"},
+     "status_ms": 1795363700000,
+     "labels": {"herdr.seen": "7", "where": "main · 4"}},
+    {"address": "r-idle", "name": "waiting", "state": "live", "cwd": "/Users/test/dev/web",
+     "parent": null, "turn": 0, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "1.0.0", "argv": ["antigravity"]},
+     "status": {"app": "antigravity", "state": "idle"},
+     "status_ms": 1795363997000,
+     "labels": {"herdr.seen": "0", "where": "side · 1"}},
+    {"address": "r-none", "name": "orphan-check", "state": "live", "cwd": "/Users/test/dev/lib",
+     "parent": null, "turn": 1, "argv": ["/Users/test/bin/queue-bot"], "foreground": null,
+     "status": null, "status_ms": null, "labels": {"herdr.seen": "0", "where": "side · 2"}}
+  ],
+  "machines": [],
+  "hidden_finished": 0
+}

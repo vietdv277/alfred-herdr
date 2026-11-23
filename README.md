@@ -9,6 +9,7 @@ Alfred 6 workflow: see every Herdr app agent's status from anywhere on the Mac.
 - [x] **Live panel**: an Alfred UI window that stays visible over any app and updates live.
 - [x] **Notifier**: a macOS banner when an agent turns blocked or done, or ends a turn in `idle`,
   while Herdr is not in front.
+- [x] **Quick reply**: a follow-up prompt sent to a finished agent without opening Herdr.
 
 ## Usage
 
@@ -39,6 +40,11 @@ yet — status `done`, or `idle` for agents such as OpenCode that never report `
 already on screen in the current Herdr tab are skipped while Herdr is in front, so pressing `hdn`
 again steps to the next one. The workflow also carries an optional hotkey trigger for the same jump
 without the list. It ships unassigned; set a key on it in Alfred (for example Hyper+N, ⌃⌥⇧⌘N).
+
+Type `hdr` to send a follow-up prompt to an agent that has finished its turn, without opening Herdr:
+pick the agent to get its `> ` prefix, then type the message after it. <kbd>⌘↩</kbd> sends the
+message and <kbd>↩</kbd> only switches to that agent. A blocked agent takes no message; answer it in
+Herdr first.
 
 ## Notifier
 
@@ -112,10 +118,12 @@ bin/link        # symlinks workflow/ into Alfred's workflows folder
 bin/make-icons  # re-renders workflow/icons/ from assets/agents/*.svg (rsvg-convert, magick)
 ```
 
-`bin/test` replays `tests/fixtures` through a fake `hc` and diffs `hd` and `hdp` against
-`tests/expected/`; jq only, no Alfred or Herdr. The notifier cases replay a fixed `hc events`
-stream from `tests/fixtures/events-*.jsonl` through a fake notify that records the banner
-arguments, and `swiftc -typecheck` covers the helper when Swift is installed.
+`bin/test` replays `tests/fixtures` through a fake `hc` and diffs `hd`, `hdp`, `hdn` and `hdr`
+against `tests/expected/`; jq only, no Alfred or Herdr. The `hdr` send step is recorded through a
+fake `hc send` and a fake banner, so the message argv is checked as it leaves Alfred. The notifier
+cases replay a fixed `hc events` stream from `tests/fixtures/events-*.jsonl` through a fake notify
+that records the banner arguments, and `swiftc -typecheck` covers the helper when Swift is
+installed.
 
 The agent logos in `assets/agents/` are the ones the Herdr app shows; each `hd` row combines its
 agent's logo with a status dot. An agent without a logo gets the generic `agent` icon.

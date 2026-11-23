@@ -1,0 +1,27 @@
+{
+  "terminals": [
+    {"address": "t-api", "name": "api-refactor", "state": "live", "cwd": "/Users/test/dev/shop",
+     "parent": null, "turn": 3, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "2.1.330", "argv": ["claude"]},
+     "status": {"app": "claude-code", "state": "done"},
+     "status_ms": 1795363995000,
+     "labels": {"herdr.seen": "3", "where": "main · 1"}},
+    {"address": "t-docs", "name": "docs-pass", "state": "live", "cwd": "/Users/test/dev/docs",
+     "parent": null, "turn": 5, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "0.31.2", "argv": ["gemini"]},
+     "status": {"app": "gemini", "state": "idle"},
+     "status_ms": 1795363880000,
+     "labels": {"herdr.seen": "1", "where": "side · 1"}},
+    {"address": "t-nameless", "name": null, "state": "live", "cwd": "/Users/test/tmp",
+     "parent": null, "turn": 2, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "1.9.0", "argv": ["codex"]},
+     "status": {"app": "codex", "state": "done"},
+     "status_ms": 1795363700000,
+     "labels": {"herdr.seen": "2", "where": "main · 2"}},
+    {"address": "t-editor", "name": "editor", "state": "live", "cwd": "/Users/test/dev/docs",
+     "parent": null, "turn": 0, "argv": ["/usr/bin/nvim"], "foreground": null,
+     "status": null, "status_ms": null, "labels": {"where": "main · 4"}}
+  ],
+  "machines": [],
+  "hidden_finished": 0
+}
