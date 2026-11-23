@@ -1,0 +1,11 @@
+#!/bin/sh
+# Stand-in for osascript in bin/test: records `<title>: <message>` in $NOTIFY_SHOW_LOG for every
+# banner instead of showing one.
+set -u
+
+if [ -z "${NOTIFY_SHOW_LOG:-}" ]; then
+  echo "fake-notify-show: NOTIFY_SHOW_LOG is not set" >&2
+  exit 2
+fi
+
+printf '%s: %s\n' "$1" "$2" >> "$NOTIFY_SHOW_LOG"

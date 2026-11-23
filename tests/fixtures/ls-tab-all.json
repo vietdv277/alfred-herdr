@@ -1,0 +1,6 @@
+{"spaces":[{"id":"sp1","name":"Proj","active":true,
+  "tabs":[{"id":"tb1","name":"a","active":true,"terminals":[{"terminal":"q-blocked-new","pane":"p1","status":"blocked","app":"kiro-cli","name":null,"sub_agents":[]},
+                                                            {"terminal":"q-blocked-old","pane":"p2","status":"blocked","app":"claude-code","name":null,"sub_agents":[]},
+                                                            {"terminal":"q-done-new","pane":"p3","status":"done","app":"opencode","name":null,"sub_agents":[]},
+                                                            {"terminal":"q-done-old","pane":"p4","status":"done","app":"gemini","name":null,"sub_agents":[]}]}]}],
+ "recent":[]}

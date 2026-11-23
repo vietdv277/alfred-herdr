@@ -7,12 +7,7 @@ set -u
 PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 app_bin=${HERDR_APP:-herdr-app}
 addr=${1-}
-
-notify() {
-  osascript -e 'on run argv' \
-    -e 'display notification (item 2 of argv) with title (item 1 of argv)' \
-    -e 'end run' "${1:-Herdr Agents}" "${2:-}" >/dev/null 2>&1 || true
-}
+source "${0:A:h:h}/lib/notify.zsh"
 
 [[ -n $addr ]] || { notify "Herdr Agents" "No agent address given"; exit 1 }
 
