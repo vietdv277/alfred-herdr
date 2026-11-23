@@ -14,7 +14,7 @@ Alfred 6 workflow: see every Herdr app agent's status from anywhere on the Mac.
 
 ## Usage
 
-Type `hd` in Alfred to list every agent running in the Herdr app in attention order: blocked, then
+Type `hda` in Alfred to list every agent running in the Herdr app in attention order: blocked, then
 agents that finished a turn and have not been looked at yet (marked `new`; the status is `done`, or
 `idle` for agents such as OpenCode that never report `done`), working, finished turns already seen,
 and idle. Within a group the newest status change comes first, and the subtitle gives its age
@@ -27,7 +27,7 @@ instead. The list refreshes once a second while it is open.
 
 Type `hdp` to open a floating panel instead: a window listing the agents, refreshed every 2 s. It
 stays above other apps, remembers its position between launches and closes with <kbd>⎋</kbd>.
-Clicking a row jumps to that agent the same way <kbd>↩</kbd> does in `hd`.
+Clicking a row jumps to that agent the same way <kbd>↩</kbd> does in `hda`.
 The list scrolls when there are more agents than fit. The panel also opens from a script or another
 workflow through the external trigger `panel`:
 
@@ -47,12 +47,14 @@ pick the agent to get its `> ` prefix, then type the message after it. <kbd>⌘�
 message and <kbd>↩</kbd> only switches to that agent. A blocked agent takes no message; answer it in
 Herdr first.
 
+The four keywords are defaults and can be changed in Alfred's Configure Workflow sheet.
+
 ## Notifier
 
 A background watcher posts one macOS banner the moment an agent turns `blocked` or `done`, or ends a
 turn in `idle` as OpenCode does, while Herdr is not the front app, so a finished run or a pending
 question is not missed from another window. Clicking the banner jumps to that agent, the same way
-<kbd>↩</kbd> does in `hd`.
+<kbd>↩</kbd> does in `hda`.
 Transitions arriving together become a single banner naming the count, a status that only repeats
 itself — another `done` carrying a new message — stays quiet, and nothing is posted while Herdr is
 frontmost.
@@ -106,7 +108,7 @@ bin/install-notifier  # ~/Library/LaunchAgents/com.vietdv277.alfred-herdr.watch.
 3. Allow notifications when macOS asks on the first banner. The permission sits under
 `Herdr Agents` in System Settings › Notifications, and survives a rebuild under the same identity.
 
-The watcher logs to `~/Library/Logs/alfred-herdr-watch.log`. `hd` and `hdp` stay the place to see
+The watcher logs to `~/Library/Logs/alfred-herdr-watch.log`. `hda` and `hdp` stay the place to see
 every agent at a glance; the banner interrupts only for a block or a
 finished turn.
 
@@ -136,7 +138,7 @@ cases replay a fixed `hc events` stream from `tests/fixtures/events-*.jsonl` thr
 that records the banner arguments, and `swiftc -typecheck` covers the helper when Swift is
 installed.
 
-The agent logos in `assets/agents/` are the ones the Herdr app shows; each `hd` row combines its
+The agent logos in `assets/agents/` are the ones the Herdr app shows; each `hda` row combines its
 agent's logo with a status dot. An agent without a logo gets the generic `agent` icon.
 
 ## Credits

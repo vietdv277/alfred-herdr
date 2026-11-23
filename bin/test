@@ -359,6 +359,45 @@ if (( $+commands[swiftc] )); then
   fi
 fi
 
+# Keywords are user configuration: the four keyword objects read a variable, and Alfred fills in the
+# shipped default. Gallery asks for at least three characters.
+(( total++ ))
+mkdir -p $repo/build
+plist_json=$(plutil -convert json -o - workflow/info.plist)
+kw_got=$(print -r -- "$plist_json" | jq -c '
+  . as $p | {
+    fields: ([.userconfigurationconfig[]? | select(.type == "textfield"
+               and .config.default != null and .config.required == false
+               and .config.trim == true and .config.placeholder == "")] | length),
+    defaults: [.userconfigurationconfig[]? | {variable, label, default: .config.default}],
+    keywords: ([.objects[] | .config.keyword // empty] | sort),
+    by_uid: (["94BB9498-18FF-42E7-98A7-017C3DF5C448", "EA1B3223-2BEC-4B3D-B326-7CB6A1934EF4",
+              "28D92DD0-0A9B-4BF6-AF6E-85913053FC78", "F5359208-0056-4FBB-BCF1-A41203C7E52F"]
+             | map(. as $u | ($p.objects[] | select(.uid == $u) | .config.keyword))),
+    short: [.userconfigurationconfig[]? | select((.config.default | length) < 3) | .variable]
+  }' 2>&1)
+kw_want='{"fields":4,'
+kw_want+='"defaults":[{"variable":"keyword_list","label":"List keyword","default":"hda"},'
+kw_want+='{"variable":"keyword_next","label":"Next keyword","default":"hdn"},'
+kw_want+='{"variable":"keyword_reply","label":"Reply keyword","default":"hdr"},'
+kw_want+='{"variable":"keyword_panel","label":"Panel keyword","default":"hdp"}],'
+kw_want+='"keywords":["{var:keyword_list}","{var:keyword_next}","{var:keyword_panel}",'
+kw_want+='"{var:keyword_reply}"],'
+kw_want+='"by_uid":["{var:keyword_list}","{var:keyword_next}","{var:keyword_reply}",'
+kw_want+='"{var:keyword_panel}"],"short":[]}'
+if [[ $kw_got == "$kw_want" ]]; then
+  print -r -- "ok   keywords.plist"
+else
+  print -r -- "FAIL keywords.plist"
+  if print -r -- "$kw_got" | jq . > $repo/build/keywords.got 2>/dev/null; then
+    print -r -- "$kw_want" | jq . > $repo/build/keywords.want
+    diff -u $repo/build/keywords.want $repo/build/keywords.got | sed 's/^/     /'
+  else
+    print -r -- "$kw_got" | sed 's/^/     /'
+  fi
+  (( failed++ ))
+fi
+
 # bin/package: the archive comes from the committed workflow/ tree, licenses at its root and no
 # source-only path inside. The plist it ships carries no assigned hotkey.
 (( total++ ))
@@ -388,6 +427,13 @@ else
      | select((.config.hotkey // 0) != 0 or (.config.hotmod // 0) != 0)] | length')
   [[ ${pkg_keys:-1} == 0 ]] ||
     { pkg_ok=0; pkg_msg+=("$pkg_keys hotkey trigger(s) carry a key") }
+  # The archive ships the same keyword defaults, so a fresh install starts on hda, hdn, hdr and hdp.
+  pkg_cfg=$(plutil -convert json -o - $pkg_out/info.plist 2>/dev/null |
+            jq -c '[.userconfigurationconfig[]? | [.variable, .config.default]]')
+  src_cfg=$(print -r -- "$plist_json" |
+            jq -c '[.userconfigurationconfig[]? | [.variable, .config.default]]')
+  [[ $pkg_cfg == "$src_cfg" ]] ||
+    { pkg_ok=0; pkg_msg+=("the packaged keyword defaults are ${pkg_cfg:-missing}") }
   [[ $(print -r -- "$pkg_out_log" | tail -1) ==
      "version: $(plutil -extract version raw -o - $pkg_out/info.plist)" ]] ||
     { pkg_ok=0; pkg_msg+=("last line was not the version: $pkg_out_log") }
