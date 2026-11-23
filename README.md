@@ -1,6 +1,7 @@
 # alfred-herdr
 
 Alfred 6 workflow: see every [Herdr](https://herdr.dev/) app agent's status from anywhere on the Mac.
+Questions and feedback: the [Alfred Forum topic](https://www.alfredforum.com/topic/24271-herdr-agents-see-jump-to-and-reply-to-herdr-coding-agents-from-alfred/).
 
 ![Agent list](workflow/images/hda.png)
 
