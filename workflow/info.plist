@@ -123,7 +123,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>hd</string>
+				<string>{var:keyword_list}</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -202,7 +202,7 @@
 				<key>argumenttype</key>
 				<integer>2</integer>
 				<key>keyword</key>
-				<string>hdp</string>
+				<string>{var:keyword_panel}</string>
 				<key>skipuniversalaction</key>
 				<true/>
 				<key>subtext</key>
@@ -250,7 +250,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>hdn</string>
+				<string>{var:keyword_next}</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -353,7 +353,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>hdr</string>
+				<string>{var:keyword_reply}</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -413,28 +413,41 @@
 	<key>readme</key>
 	<string>## Usage
 
-Type `hd` in Alfred to list every agent running in the Herdr app. Blocked agents come first, then
-working, done and idle; sub-agents are listed under their parent. Type to narrow the list; all
-words must match.
+See and jump to every agent running in the Herdr app, from anywhere on the Mac.
 
-Press &lt;kbd&gt;↩&lt;/kbd&gt; to jump to the chosen agent: Herdr comes to the front, selects the agent's
-space and tab and focuses its pane. An agent with no pane, such as a parked sub-agent, opens as a
-peek instead.
+List every agent and jump to one via the `hda` keyword.
 
-The list refreshes once a second while it is open.
+* &lt;kbd&gt;↩&lt;/kbd&gt; Jump to the chosen agent.
+* Type to narrow the list; all words must match.
 
-Type `hdp` to open a floating panel instead: a window listing the agents, refreshed every 2 s. It
-stays above other apps, remembers its position between launches and closes with &lt;kbd&gt;⎋&lt;/kbd&gt;.
-Clicking a row jumps to that agent the same way &lt;kbd&gt;↩&lt;/kbd&gt; does in `hd`.
+Blocked agents come first, then working, done and idle, with sub-agents listed under their parent. On
+a jump Herdr comes to the front, selects the agent's space and tab and focuses its pane; an agent
+with no pane, such as a parked sub-agent, opens as a peek instead. The list refreshes once a second
+while it is open.
 
-Type `hdn` to jump to the agent that most needs attention: agents already on screen in the current
-Herdr tab are skipped, so a repeated press steps on. A hotkey trigger for the same jump stays
-unassigned until a key is set on it in Alfred.
+Jump to the agent that most needs attention via the `hdn` keyword.
 
-Type `hdr` to send a follow-up prompt to an agent without opening Herdr:
-`hdr &lt;agent&gt; &gt; &lt;message&gt;`. &lt;kbd&gt;⌘↩&lt;/kbd&gt; sends the message and &lt;kbd&gt;↩&lt;/kbd&gt;
-only switches to the agent. Only an agent that finished its turn (`done` or `idle`) takes a
-message; a blocked one has to be answered in Herdr first.
+* &lt;kbd&gt;↩&lt;/kbd&gt; Jump to that agent.
+
+Agents already on screen in the current Herdr tab are skipped, so a repeated press steps on. An
+optional hotkey trigger for the same jump ships unassigned; set a key on it in Alfred.
+
+Send a follow-up prompt to an agent via the `hdr` keyword.
+
+* &lt;kbd&gt;↩&lt;/kbd&gt; Switch to the agent.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Send the message.
+
+The form is `hdr &lt;agent&gt; &gt; &lt;message&gt;`. Only an agent that finished its turn (`done` or `idle`)
+takes a message; a blocked one has to be answered in Herdr first.
+
+Open the floating agents panel via the `hdp` keyword.
+
+* &lt;kbd&gt;⎋&lt;/kbd&gt; Close the panel.
+
+The panel lists the agents and refreshes every 2 s. It stays above other apps, remembers its position
+between launches, and clicking a row jumps to that agent the same way &lt;kbd&gt;↩&lt;/kbd&gt; does in `hda`.
+
+The four keywords are defaults and can be changed in the workflow's Configure Workflow sheet.
 
 ## Requirements
 
@@ -515,8 +528,95 @@ message; a blocked one has to be answered in Herdr first.
 			<integer>740</integer>
 		</dict>
 	</dict>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_list</string>
+			<key>label</key>
+			<string>List keyword</string>
+			<key>description</key>
+			<string>List every agent and jump to one</string>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>hda</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+		</dict>
+		<dict>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_next</string>
+			<key>label</key>
+			<string>Next keyword</string>
+			<key>description</key>
+			<string>Jump to the agent that most needs attention</string>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>hdn</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+		</dict>
+		<dict>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_reply</string>
+			<key>label</key>
+			<string>Reply keyword</string>
+			<key>description</key>
+			<string>Send a follow-up prompt to an agent</string>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>hdr</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+		</dict>
+		<dict>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_panel</string>
+			<key>label</key>
+			<string>Panel keyword</string>
+			<key>description</key>
+			<string>Open the floating agents panel</string>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>hdp</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+		</dict>
+	</array>
 	<key>version</key>
-	<string>1.0.0</string>
+	<string>1.0.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/vietdv277/alfred-herdr</string>
 </dict>
