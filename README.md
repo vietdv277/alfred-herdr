@@ -1,6 +1,6 @@
 # alfred-herdr
 
-Alfred 6 workflow: see every Herdr app agent's status from anywhere on the Mac.
+Alfred 6 workflow: see every [Herdr](https://herdr.dev/) app agent's status from anywhere on the Mac.
 
 ## Features
 
