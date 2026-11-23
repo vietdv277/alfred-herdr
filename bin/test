@@ -38,7 +38,7 @@ check() { # check <case> <fixture file|fail> <query> <hd|hdp>
   out=${out//$icons/@ICONS@}
   want=$(<$expected)
 
-  if [[ $out == $want ]]; then
+  if [[ $out == "$want" ]]; then
     print -r -- "ok   $case.$which"
     return 0
   fi
