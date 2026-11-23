@@ -42,7 +42,7 @@ sel=$(jq -c -L "$lib" --arg q "$query" --arg home "$HOME" --argjson now "$now" '
   | ($split.text | if . == null then "" else trimws end) as $text
   | agentrecords($home)
   | map(. as $r
-      | . + {hay: ([($r.name // ""), $r.agent, ($r.where // ""), $r.cwd, ($r.status // "")]
+      | . + {hay: ([($r.name // ""), $r.address, $r.agent, ($r.where // ""), $r.cwd, ($r.status // "")]
                   | map(ascii_downcase) | join(" "))})
   | to_entries
   | map(select(.value as $v | all($words[]; . as $w | ($v.hay | contains($w)))))

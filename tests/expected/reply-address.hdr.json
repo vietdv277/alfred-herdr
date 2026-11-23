@@ -1,0 +1,1 @@
+{"items":[{"title":"Send to codex — main · 2: hi","subtitle":"⌘↩ send · ↩ switch to it","arg":"t-nameless","icon":{"path":"icons/codex-done.png"},"valid":true,"mods":{"cmd":{"valid":true,"arg":"t-nameless","subtitle":"Send this message","variables":{"reply_text":"hi","reply_name":"codex"}}}}]}
