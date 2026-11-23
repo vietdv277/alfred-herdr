@@ -1,10 +1,12 @@
 #!/bin/zsh
-# Write the watcher's LaunchAgent from the template to the path in $1, without starting it.
+# Write the watcher's LaunchAgent from the template to $1, running the watch script at $2, without
+# starting it.
 # plutil edits the plist itself, so paths holding & | \ < or $ need no quoting games.
 set -eu
 cd "${0:A:h}/.."
 
-target=${1:?usage: bin/make-watch-plist <path>}
+target=${1:?usage: bin/make-watch-plist <plist> <watch>}
+watch=${2:?usage: bin/make-watch-plist <plist> <watch>}
 label=com.vietdv277.alfred-herdr.watch
 log=$HOME/Library/Logs/alfred-herdr-watch.log
 
@@ -12,7 +14,7 @@ mkdir -p "${target:h}"
 cp notifier/$label.plist "$target"
 # plutil -replace on an array index inserts at it instead of overwriting.
 plutil -remove ProgramArguments.1 "$target"
-plutil -insert ProgramArguments.1 -string "$PWD/workflow/scripts/watch" "$target"
+plutil -insert ProgramArguments.1 -string "$watch" "$target"
 plutil -replace StandardOutPath -string "$log" "$target"
 plutil -replace StandardErrorPath -string "$log" "$target"
 plutil -lint "$target" >/dev/null

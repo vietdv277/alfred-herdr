@@ -1,6 +1,6 @@
 #!/bin/zsh
-# Write the watcher's LaunchAgent and start it. Run bin/build-notifier first: the watcher posts
-# through the app bundle, not through this script.
+# Stage the watcher outside the checkout, write its LaunchAgent and start it. Run bin/build-notifier
+# first: the watcher posts through the app bundle. Re-run after each watcher change.
 set -eu
 cd "${0:A:h}/.."
 
@@ -9,7 +9,8 @@ domain=gui/$(id -u)
 target=$HOME/Library/LaunchAgents/$label.plist
 
 mkdir -p "$HOME/Library/LaunchAgents"
-bin/make-watch-plist "$target" >/dev/null
+watch=$(bin/stage-notifier "${NOTIFY_HOME:-}")
+bin/make-watch-plist "$target" "$watch" >/dev/null
 
 launchctl bootout "$domain/$label" 2>/dev/null || true
 # bootout returns before the job is gone, and bootstrap fails while the old one is still loaded.
