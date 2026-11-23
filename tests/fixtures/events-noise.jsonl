@@ -1,0 +1,7 @@
+{"channel":null,"seq":137,"terminals":[{"address":"t1s","name":"api-refactor","state":"live","cwd":"/Users/test/dev/shop","parent":null,"turn":3,"argv":["/bin/zsh","-l"],"status":{"app":"claude-code","state":"working","msg":"Running tests"},"status_ms":1795363995000,"labels":{"herdr.seen":"3","where":"main · 1"}}]}
+{"jsonrpc":"2.0","method":"heartbeat","params":{"seq":137}}
+this line is not json at all
+{"jsonrpc":"2.0","method":"event","params":{"data":{"records":{},"reported":true,"status":{"app":"claude-code","msg":"All tests pass","state":"done"}},"seq":138,"terminal":"t1s","type":"turn"}}
+[1,2,3]
+{"jsonrpc":"2.0","method":"event","params":{"data":{"records":{},"reported":true,"status":{"app":"claude-code","msg":"All tests pass","state":"done"}},"seq":139,"terminal":"t1s","type":"status"}}
+{"jsonrpc":"2.0","method":"heartbeat","params":{"seq":139}}

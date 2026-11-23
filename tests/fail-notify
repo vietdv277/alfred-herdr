@@ -1,0 +1,4 @@
+#!/bin/sh
+# Stand-in for a notification helper that cannot post: bin/test checks that watch logs the failure
+# to stderr and keeps going.
+exit 1

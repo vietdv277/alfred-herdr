@@ -1,0 +1,15 @@
+#!/bin/zsh
+# Build the banner helper into an app bundle and sign it. The bundle id must stay stable, and a
+# self-signed identity must sign it: macOS drops the notification permission of an unsigned copy.
+set -eu
+cd "${0:A:h}/.."
+
+app=${NOTIFY_APP:-$HOME/Applications/Herdr Agents.app}
+identity=${NOTIFY_IDENTITY:-alfred-herdr local signing}
+
+mkdir -p "$app/Contents/MacOS"
+swiftc -O -o "$app/Contents/MacOS/herdr-notify" notifier/HerdrNotify.swift
+cp notifier/Info.plist "$app/Contents/Info.plist"
+codesign --force -s "$identity" "$app"
+
+print -r -- "built $app"
