@@ -10,6 +10,8 @@ addr=${1-}
 source "${0:A:h:h}/lib/notify.zsh"
 
 [[ -n $addr ]] || { notify "Herdr Agents" "No agent address given"; exit 1 }
+command -v "$app_bin" >/dev/null 2>&1 ||
+  { notify "Herdr Agents" "herdr-app not found: open Herdr once from Applications"; exit 1 }
 
 open -a Herdr
 

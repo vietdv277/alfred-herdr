@@ -26,6 +26,7 @@ check() { # check <case> <fixture file|fail|rpc-error> <query> <hd|hdp>
 
   case $fixture in
     fail) env_vars=(HC=$fake HC_FAIL=$hc_fail) ;;
+    nohc) env_vars=(HC=/nonexistent/hc) ;;
     rpc-error) env_vars=(HC=$fake HC_RPC_ERROR=1) ;;
     *) env_vars=(HC=$fake HC_FIXTURE=$repo/tests/fixtures/$fixture) ;;
   esac
@@ -64,6 +65,7 @@ check empty empty.json "" hd
 check empty empty.json "" hdp
 check fail fail "" hd
 check fail fail "" hdp
+check nohc nohc "" hd
 check rpc-error rpc-error "" hd
 check rpc-error rpc-error "" hdp
 
@@ -215,6 +217,35 @@ check_jump tab-all queue.json ls-tab-all.json
 HDN_FRONT=com.example.other check_jump background queue.json ls-tab-all.json
 check_jump core-down fail -
 
+# focus.sh with no herdr-app on the machine: it says so and never opens Herdr.
+(( total++ ))
+fake_open=$repo/build/fake-open
+mkdir -p "${fake_open:h}"
+cat > $fake_open <<'EOF'
+#!/bin/sh
+# Stand-in for `open` in bin/test: records the call in $OPEN_LOG instead of launching an app.
+set -u
+printf '%s\n' "$*" >> "$OPEN_LOG"
+EOF
+chmod +x $fake_open
+focus_noapp_show=$repo/build/focus-noapp.show.log
+focus_noapp_open=$repo/build/focus-noapp.open.log
+: > $focus_noapp_show
+: > $focus_noapp_open
+rc=0
+env PATH="${fake_open:h}:$PATH" OPEN_LOG=$focus_noapp_open \
+    NOTIFY_SHOW_CMD=$fake_show NOTIFY_SHOW_LOG=$focus_noapp_show \
+    HERDR_APP=/nonexistent/herdr-app \
+    /bin/zsh workflow/scripts/focus.sh fresh-done || rc=$?
+want="Herdr Agents: herdr-app not found: open Herdr once from Applications"
+if (( rc == 1 )) && [[ $(<$focus_noapp_show) == "$want" ]] && [[ ! -s $focus_noapp_open ]]; then
+  print -r -- "ok   focus.noapp"
+else
+  print -r -- "FAIL focus.noapp (exit $rc)"
+  sed 's/^/     /' $focus_noapp_show
+  (( failed++ ))
+fi
+
 check_hdr pick reply-pick.json ""
 check_hdr pick-query reply-pick.json "main"
 check_hdr nomatch reply-pick.json "zzz"
@@ -326,6 +357,93 @@ if (( $+commands[swiftc] )); then
     print -r -- "$out" | sed 's/^/     /'
     (( failed++ ))
   fi
+fi
+
+# bin/package: the archive comes from the committed workflow/ tree, licenses at its root and no
+# source-only path inside. The plist it ships carries no assigned hotkey.
+(( total++ ))
+pkg_out=$repo/build/package
+rm -rf $pkg_out
+pkg_ok=1
+pkg_msg=()
+if ! pkg_out_log=$(PACKAGE_OUT=$pkg_out bin/package 2>&1); then
+  pkg_ok=0
+  pkg_msg+=("bin/package failed: $pkg_out_log")
+else
+  pkg_zip=$pkg_out/Herdr-Agents.alfredworkflow
+  pkg_names=$(unzip -Z1 $pkg_zip 2>/dev/null)
+  for want in info.plist LICENSE LICENSE-LobeHub.txt LICENSE-Lucide.txt \
+              scripts/agents.sh icons/claude-done.png; do
+    print -r -- "$pkg_names" | grep -qx -- "$want" || { pkg_ok=0; pkg_msg+=("missing $want") }
+  done
+  if print -r -- "$pkg_names" | grep -qE '^(tests|bin|assets|\.claude)(/|$)'; then
+    pkg_ok=0
+    pkg_msg+=("a source-only path is inside the archive")
+  fi
+  unzip -p $pkg_zip info.plist > $pkg_out/info.plist 2>/dev/null
+  plutil -lint $pkg_out/info.plist >/dev/null 2>&1 ||
+    { pkg_ok=0; pkg_msg+=("the packaged info.plist does not lint") }
+  pkg_keys=$(plutil -convert json -o - $pkg_out/info.plist 2>/dev/null | jq -c '
+    [.objects[] | select(.type == "alfred.workflow.trigger.hotkey")
+     | select((.config.hotkey // 0) != 0 or (.config.hotmod // 0) != 0)] | length')
+  [[ ${pkg_keys:-1} == 0 ]] ||
+    { pkg_ok=0; pkg_msg+=("$pkg_keys hotkey trigger(s) carry a key") }
+  [[ $(print -r -- "$pkg_out_log" | tail -1) ==
+     "version: $(plutil -extract version raw -o - $pkg_out/info.plist)" ]] ||
+    { pkg_ok=0; pkg_msg+=("last line was not the version: $pkg_out_log") }
+fi
+if (( pkg_ok )); then
+  print -r -- "ok   package.archive"
+else
+  print -r -- "FAIL package.archive"
+  print -r -- ${(F)pkg_msg} | sed 's/^/     /'
+  (( failed++ ))
+fi
+
+# The same archive from a workflow/ tree whose plist carries a hotkey must be refused. The tree is
+# built as loose objects beside the repo, so no throwaway commit lands anywhere.
+(( total++ ))
+bad=$repo/build/package-bad
+rm -rf $bad
+mkdir -p $bad/objects
+bad_ok=0
+bad_msg=
+git show HEAD:workflow/info.plist > $bad/info.plist 2>/dev/null
+bad_idx=$(plutil -convert json -o - $bad/info.plist 2>/dev/null |
+          jq -c '[.objects[] | .type] | index("alfred.workflow.trigger.hotkey")')
+if [[ $bad_idx != null && -n $bad_idx ]]; then
+  plutil -replace "objects.$bad_idx.config.hotkey" -integer 49 $bad/info.plist
+  export GIT_OBJECT_DIRECTORY=$bad/objects
+  export GIT_ALTERNATE_OBJECT_DIRECTORIES=$(git rev-parse --git-common-dir)/objects
+  bad_blob=$(git hash-object -w $bad/info.plist)
+  bad_work=$(git ls-tree HEAD:workflow |
+             awk -v b=$bad_blob '$4 == "info.plist" { $3 = b }
+                                 { printf "%s %s %s\t%s\n", $1, $2, $3, $4 }' |
+             git mktree)
+  bad_ref=$(git ls-tree HEAD |
+            awk -v t=$bad_work '$4 == "workflow" { $3 = t }
+                                { printf "%s %s %s\t%s\n", $1, $2, $3, $4 }' |
+            git mktree)
+  unset GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
+  rc=0
+  env GIT_OBJECT_DIRECTORY=$bad/objects \
+      GIT_ALTERNATE_OBJECT_DIRECTORIES=$(git rev-parse --git-common-dir)/objects \
+      PACKAGE_REF=$bad_ref PACKAGE_OUT=$bad/out \
+      bin/package > $bad/out.log 2> $bad/err.log || rc=$?
+  if (( rc != 0 )) && grep -q hotkey $bad/err.log &&
+     [[ ! -e $bad/out/Herdr-Agents.alfredworkflow ]]; then
+    bad_ok=1
+  else
+    bad_msg="exit $rc: $(<$bad/out.log) $(<$bad/err.log)"
+  fi
+else
+  bad_msg="no hotkey trigger in info.plist to assign a key to"
+fi
+if (( bad_ok )); then
+  print -r -- "ok   package.hotkey"
+else
+  print -r -- "FAIL package.hotkey ($bad_msg)"
+  (( failed++ ))
 fi
 
 if (( failed > 0 )); then

@@ -8,6 +8,8 @@ hc_request='{"jsonrpc":"2.0","id":1,"method":"terminal.list","params":{}}'
 # Leaves the terminal.list result object in $result, or a reason in $hc_error and returns 1.
 hc_terminal_list() {
   local reply
+  command -v "$hc_bin" >/dev/null 2>&1 ||
+    { hc_error="hc not found: install Herdr and open it once from Applications"; return 1 }
   reply=$("$hc_bin" connect 2>&1 <<<$hc_request) ||
     { hc_error=${reply:-$hc_bin connect failed}; return 1 }
 
