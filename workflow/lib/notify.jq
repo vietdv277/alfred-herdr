@@ -1,9 +1,15 @@
-# Alerts over `hc events --json`: one record per transition into blocked or done, and nothing for a
-# repeated state, a heartbeat, a non-agent terminal or a garbled line. Started by workflow/scripts/watch.
+# Alerts over `hc events --json`: one record per finished turn — into blocked or done, or `working`
+# turning `idle` — and nothing for a repeated state, a heartbeat, a non-agent terminal or a garbled
+# line. Started by workflow/scripts/watch.
 #
 # `records` is agents.jq's agent model, passed in as a filter because jq 1.8 aborts when a module
 # function calls another module's function that takes arguments. `liveagent` is a leaf, so it is safe.
 include "agents";
+
+# A turn ending: a change into blocked or done, or the `idle` of an agent such as OpenCode that
+# never reports `done`. `idle` from any other remembered status is not a turn ending.
+def turnend($state; $was): (($state == "blocked" or $state == "done") and $state != $was)
+                           or ($state == "idle" and $was == "working");
 
 # "name — where" for a terminal the snapshot described, "agent — address" for one seen only in events.
 def alerttitle($address):
@@ -40,7 +46,7 @@ def alerts(records):
           else
             .agents[$address] = ($was + {agent: $app, status: ($state // $was.status),
                                          msg: $status.msg})
-            | if ($state == "blocked" or $state == "done") and $state != $was.status then
+            | if turnend($state; $was.status) then
                 .agents[$address] as $now
                 | .out = {address: $address, state: $state,
                           title: ($now | alerttitle($address)), body: ($now | alertbody($state))}

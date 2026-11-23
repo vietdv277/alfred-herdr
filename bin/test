@@ -59,6 +59,7 @@ check mixed mixed.json "" hdp
 check mixed-query mixed.json "api blocked" hd
 check attention attention.json "" hd
 check attention attention.json "" hdp
+check idle-turns idle-turns.json "" hd
 check empty empty.json "" hd
 check empty empty.json "" hdp
 check fail fail "" hd
@@ -141,6 +142,7 @@ check_jump() { # check_jump <case> <fixture file|fail|rpc-error> <herdr-app ls f
 }
 
 check_hdn queue queue.json -
+check_hdn idle-turns idle-turns.json -
 check_hdn done queue-done.json -
 check_hdn tab queue.json ls-tab-blocked.json
 check_hdn subagent queue.json ls-tab-subagent.json
@@ -196,6 +198,8 @@ check_notify() { # check_notify <case> <events fixture> <bundle id in front> [se
 }
 
 check_notify done events-done.jsonl com.example.other
+check_notify idle events-idle.jsonl com.example.other
+check_notify idle-quiet events-idle-quiet.jsonl com.example.other
 check_notify repeat events-repeat.jsonl com.example.other
 check_notify shell events-shell.jsonl com.example.other
 check_notify unknown events-unknown.jsonl com.example.other

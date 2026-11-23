@@ -13,9 +13,9 @@ def iconpath($base; $status): "\($base)/\(logo)-\(if ["blocked","working","done"
                                                        | index([$status]) then $status
                                                        else "none" end).png";
 
-# Attention class: blocked, new (done and unseen), working, done and seen, idle, then no status.
+# Attention class: blocked, new (done or idle, unseen), working, done and seen, idle, then no status.
 def attentionclass($unseen): if . == "blocked" then 0
-  elif . == "done" and $unseen then 1
+  elif (. == "done" or . == "idle") and $unseen then 1
   elif . == "working" then 2
   elif . == "done" then 3
   elif . == "idle" then 4
@@ -48,8 +48,8 @@ def age($now): if . == null then ""
     else "\((($ms / 86400000) | floor))d" end
   end;
 
-# Status part of a subtitle: "new" for unseen done, the status with its age, then a working
-# agent's current message.
+# Status part of a subtitle: "new" for a finished turn not yet seen, the status with its age, then a
+# working agent's current message.
 def statusline($now):
   [(if .class == 1 then "new" else empty end),
    ((.status | statusword)
@@ -58,7 +58,8 @@ def statusline($now):
   | join(" · ");
 
 # Every live agent as one record: the agent model plus cwd, turn, cwdshort, seen, unseen, class
-# and msg. Feeder order; the caller filters and sorts.
+# and msg. Feeder order; the caller filters and sorts. A turn that outran the `herdr.seen` label is
+# unseen, and a missing label counts as 0, so an agent never drawn yet stays unseen.
 def agentrecords($home):
   [.terminals[]
    | . + {agent: (.status.app // ((.argv[0] // "/?") | split("/") | last))}
@@ -69,7 +70,7 @@ def agentrecords($home):
       status: .status.state, msg: .status.msg, turn: $turn, cwd: (.cwd // ""),
       parent: .parent, state: .state, status_ms: .status_ms,
       seen: $seen,
-      unseen: ($seen != null and $turn > $seen)} as $r
+      unseen: ($turn > ($seen // 0))} as $r
    | $r + {cwdshort: ($r.cwd | cwdshort($home)),
            class: ($r.status | attentionclass($r.unseen))}];
 
@@ -84,8 +85,8 @@ def hdrow($now):
      icon: {path: ($r.agent | iconpath("icons"; $r.status))},
      valid: true};
 
-# The agents that need attention: blocked, then done and unseen, in attention order. Working,
-# done and seen, idle and no-status agents never need it.
+# The agents that need attention: blocked, then done or idle and unseen, in attention order.
+# Working, done or idle and seen, and no-status agents never need it.
 def attentionqueue($home):
   agentrecords($home) | map(select(.class <= 1)) | to_entries | attentionsort | map(.value);
 

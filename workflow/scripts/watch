@@ -1,6 +1,7 @@
 #!/bin/zsh
-# Long-running watcher: one banner when an agent turns blocked or done while Herdr is not in front.
-# Reconnects to `hc events` with a backoff, and turns a burst of transitions into one banner.
+# Long-running watcher: one banner when an agent turns blocked or done, or ends a turn in `idle`,
+# while Herdr is not in front. Reconnects to `hc events` with a backoff, and turns a burst of
+# transitions into one banner.
 set -u
 
 # A LaunchAgent starts with a minimal PATH.
