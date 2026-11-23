@@ -5,12 +5,11 @@ set -u
 
 # Alfred runs scripts with a minimal PATH.
 PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
-hc_bin=${HC:-hc}
 query=${1-}
 lib=${0:A:h:h}/lib
 # Age in subtitles is measured from here; a fixed value keeps tests deterministic.
 now=${HERDR_NOW_MS:-$(( $(date +%s) * 1000 ))}
-request='{"jsonrpc":"2.0","id":1,"method":"terminal.list","params":{}}'
+source "$lib/hc.zsh"
 
 # One invalid row, so Alfred says what went wrong instead of showing nothing.
 fail() {
@@ -18,14 +17,7 @@ fail() {
   exit 0
 }
 
-reply=$("$hc_bin" connect 2>&1 <<<$request) ||
-  fail "Herdr core is not running" "${reply:-$hc_bin connect failed}"
-
-# One JSON line per message; the reply to request id 1 carries the result.
-result=$(print -r -- "$reply" | jq -cRn 'first(inputs | fromjson? | objects | select(.id == 1) | .result) // empty' 2>/dev/null) ||
-  fail "Herdr core is not running" "unexpected hc connect output: ${reply:0:160}"
-[[ -n $result ]] ||
-  fail "Herdr core is not running" "${${reply:0:160}:-$hc_bin connect gave no reply}"
+hc_terminal_list || fail "Herdr core is not running" "$hc_error"
 
 json=$(jq -c -L "$lib" --arg q "$query" --arg home "$HOME" --argjson now "$now" '
   include "agents";
@@ -34,13 +26,7 @@ json=$(jq -c -L "$lib" --arg q "$query" --arg home "$HOME" --argjson now "$now" 
   | map(. as $r
       | . + {hay: ([($r.name // ""), $r.agent, ($r.where // ""), $r.cwd, ($r.status // "")]
                   | map(ascii_downcase) | join(" ")),
-             item: {title: (($r.name // $r.agent) + " — " + ($r.where // "")),
-                    subtitle: (($r | statusline($now)) + " · " + $r.agent
-                               + " · turn " + ($r.turn | tostring) + " · " + $r.cwdshort
-                               + (if $r.parent then " · under " + $r.parent else "" end)),
-                    arg: $r.address,
-                    icon: {path: ($r.agent | iconpath("icons"; $r.status))},
-                    valid: true}})
+             item: hdrow($now)})
   | to_entries
   | map(select(.value as $v | all($words[]; . as $w | ($v.hay | contains($w)))))
   | attentionsort

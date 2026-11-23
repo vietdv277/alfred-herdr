@@ -66,6 +66,98 @@ check fail fail "" hdp
 check rpc-error rpc-error "" hd
 check rpc-error rpc-error "" hdp
 
+# hdn: the most urgent agent in one row, skipping what the Herdr tab already shows.
+fake_app=$repo/tests/fake-herdr-app
+fake_focus=$repo/tests/fake-focus
+fake_show=$repo/tests/fake-notify-show
+
+hdn_env() { # hdn_env <fixture file|fail|rpc-error> <herdr-app ls file|fail|->
+  local fixture=$1 ls=$2
+  hdn_vars=()
+  case $fixture in
+    fail) hdn_vars=(HC=$fake HC_FAIL=$hc_fail) ;;
+    rpc-error) hdn_vars=(HC=$fake HC_RPC_ERROR=1) ;;
+    *) hdn_vars=(HC=$fake HC_FIXTURE=$repo/tests/fixtures/$fixture) ;;
+  esac
+  case $ls in
+    fail) hdn_vars+=("HERDR_LS_FAIL=1") ;;
+    -) ;;
+    *) hdn_vars+=("HERDR_LS=$repo/tests/fixtures/$ls") ;;
+  esac
+  hdn_vars+=("HERDR_APP=$fake_app")
+  hdn_vars+=("HERDR_FRONT_CMD=print -r -- ${HDN_FRONT:-dev.herdr.app}")
+}
+
+check_hdn() { # check_hdn <case> <fixture file|fail|rpc-error> <herdr-app ls file|fail|->
+  local case=$1 out want
+  local expected=tests/expected/$case.hdn.json
+  (( total++ ))
+  hdn_env "$2" "$3"
+
+  out=$(env $hdn_vars /bin/zsh workflow/scripts/next.sh)
+  want=$(<$expected)
+
+  if [[ $out == "$want" ]]; then
+    print -r -- "ok   $case.hdn"
+    return 0
+  fi
+
+  print -r -- "FAIL $case.hdn"
+  diff -u <(print -r -- $want | jq .) <(print -r -- $out | jq .) | sed 's/^/     /'
+  (( failed++ ))
+}
+
+check_jump() { # check_jump <case> <fixture file|fail|rpc-error> <herdr-app ls file|->
+  local case=$1 out want rc=0
+  local expected=tests/expected/jump-$case.log
+  local focus_log=$repo/build/jump-$case.focus.log show_log=$repo/build/jump-$case.show.log
+  (( total++ ))
+  hdn_env "$2" "$3"
+  mkdir -p $repo/build
+  : > $focus_log
+  : > $show_log
+
+  env $hdn_vars FOCUS_CMD=$fake_focus NOTIFY_SHOW_CMD=$fake_show \
+      FOCUS_LOG=$focus_log NOTIFY_SHOW_LOG=$show_log \
+      /bin/zsh workflow/scripts/next.sh --jump || rc=$?
+
+  if (( rc != 0 )); then
+    print -r -- "FAIL jump.$case (next.sh exited $rc)"
+    (( failed++ ))
+    return 1
+  fi
+
+  out=$( { sed 's/^/focus: /' $focus_log; sed 's/^/notify: /' $show_log } )
+  want=$(<$expected)
+
+  if [[ $out == "$want" ]]; then
+    print -r -- "ok   jump.$case"
+    return 0
+  fi
+
+  print -r -- "FAIL jump.$case"
+  diff -u <(print -r -- "$want") <(print -r -- "$out") | sed 's/^/     /'
+  (( failed++ ))
+}
+
+check_hdn queue queue.json -
+check_hdn done queue-done.json -
+check_hdn tab queue.json ls-tab-blocked.json
+check_hdn subagent queue.json ls-tab-subagent.json
+check_hdn tab-all queue.json ls-tab-all.json
+HDN_FRONT=com.example.other check_hdn background queue.json ls-tab-all.json
+check_hdn empty empty.json -
+check_hdn ls-fail queue.json fail
+check_hdn fail fail -
+check_hdn rpc-error rpc-error -
+
+check_jump target queue.json -
+check_jump tab queue.json ls-tab-blocked.json
+check_jump none empty.json -
+check_jump tab-all queue.json ls-tab-all.json
+HDN_FRONT=com.example.other check_jump background queue.json ls-tab-all.json
+check_jump core-down fail -
+
 # The watcher: one `hc events` stream from tests/fixtures/events-*.jsonl through a fake notify
 # that records every banner, diffed against the recorded arguments.
 fake_notify=$repo/tests/fake-notify

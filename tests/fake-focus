@@ -1,0 +1,11 @@
+#!/bin/sh
+# Stand-in for focus.sh in bin/test: records the agent address it was handed in $FOCUS_LOG,
+# one line per call, instead of touching Herdr.
+set -u
+
+if [ -z "${FOCUS_LOG:-}" ]; then
+  echo "fake-focus: FOCUS_LOG is not set" >&2
+  exit 2
+fi
+
+printf '%s\n' "$*" >> "$FOCUS_LOG"

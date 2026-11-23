@@ -1,0 +1,20 @@
+#!/bin/sh
+# Stand-in for `herdr-app` in bin/test: `ls` prints the tree in $HERDR_LS, or fails when
+# $HERDR_LS_FAIL is set. Every other subcommand is unsupported.
+set -u
+
+case "${1:-}" in
+  ls)
+    if [ -n "${HERDR_LS_FAIL:-}" ]; then
+      echo "fake-herdr-app: no app running" >&2
+      exit 1
+    fi
+    if [ -n "${HERDR_LS:-}" ]; then
+      cat "$HERDR_LS"
+    fi
+    ;;
+  *)
+    echo "fake-herdr-app: unsupported call: $*" >&2
+    exit 2
+    ;;
+esac

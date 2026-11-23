@@ -34,6 +34,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>EA1B3223-2BEC-4B3D-B326-7CB6A1934EF4</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>9A9F5B0B-7A30-4950-9829-3C1B5795B2A4</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>F5359208-0056-4FBB-BCF1-A41203C7E52F</key>
 		<array>
 			<dict>
@@ -45,6 +58,19 @@
 				<string></string>
 				<key>vitoclose</key>
 				<true/>
+			</dict>
+		</array>
+		<key>F7D82032-55B0-4589-9197-35F2B076C52C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>77054570-CDE0-48B0-B54D-E876BDEA13E2</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
 			</dict>
 		</array>
 	</dict>
@@ -185,6 +211,109 @@
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>hdn</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Listing Herdr agents…</string>
+				<key>script</key>
+				<string>/bin/zsh ./scripts/next.sh</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Jump to the most urgent agent</string>
+				<key>title</key>
+				<string>Next Herdr agent</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>EA1B3223-2BEC-4B3D-B326-7CB6A1934EF4</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>argumenttext</key>
+				<string></string>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>0</integer>
+				<key>hotmod</key>
+				<integer>0</integer>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>F7D82032-55B0-4589-9197-35F2B076C52C</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>/bin/zsh ./scripts/next.sh --jump</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>77054570-CDE0-48B0-B54D-E876BDEA13E2</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>## Usage
@@ -201,7 +330,11 @@ The list refreshes once a second while it is open.
 
 Type `hdp` to open a floating panel instead: a window listing the agents, refreshed every 2 s. It
 stays above other apps, remembers its position between launches and closes with &lt;kbd&gt;⎋&lt;/kbd&gt;.
-Clicking a row jumps to that agent the same way &lt;kbd&gt;↩&lt;/kbd&gt; does in `hd`.</string>
+Clicking a row jumps to that agent the same way &lt;kbd&gt;↩&lt;/kbd&gt; does in `hd`.
+
+Type `hdn` to jump to the agent that most needs attention: agents already on screen in the current
+Herdr tab are skipped, so a repeated press steps on. A hotkey trigger for the same jump stays
+unassigned until a key is set on it in Alfred.</string>
 	<key>uidata</key>
 	<dict>
 		<key>069BC4A1-5966-4CCD-9E38-89468A0D0D5D</key>
@@ -238,6 +371,27 @@ Clicking a row jumps to that agent the same way &lt;kbd&gt;↩&lt;/kbd&gt; does 
 			<integer>80</integer>
 			<key>ypos</key>
 			<integer>220</integer>
+		</dict>
+		<key>EA1B3223-2BEC-4B3D-B326-7CB6A1934EF4</key>
+		<dict>
+			<key>xpos</key>
+			<integer>80</integer>
+			<key>ypos</key>
+			<integer>610</integer>
+		</dict>
+		<key>F7D82032-55B0-4589-9197-35F2B076C52C</key>
+		<dict>
+			<key>xpos</key>
+			<integer>80</integer>
+			<key>ypos</key>
+			<integer>480</integer>
+		</dict>
+		<key>77054570-CDE0-48B0-B54D-E876BDEA13E2</key>
+		<dict>
+			<key>xpos</key>
+			<integer>320</integer>
+			<key>ypos</key>
+			<integer>480</integer>
 		</dict>
 	</dict>
 	<key>version</key>

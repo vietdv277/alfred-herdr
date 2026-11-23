@@ -72,3 +72,28 @@ def agentrecords($home):
       unseen: ($seen != null and $turn > $seen)} as $r
    | $r + {cwdshort: ($r.cwd | cwdshort($home)),
            class: ($r.status | attentionclass($r.unseen))}];
+
+# One row as hd prints it, so hdn lands on the same title, subtitle and icon.
+def hdrow($now):
+  . as $r
+  | {title: (($r.name // $r.agent) + " — " + ($r.where // "")),
+     subtitle: (($r | statusline($now)) + " · " + $r.agent
+                + " · turn " + ($r.turn | tostring) + " · " + $r.cwdshort
+                + (if $r.parent then " · under " + $r.parent else "" end)),
+     arg: $r.address,
+     icon: {path: ($r.agent | iconpath("icons"; $r.status))},
+     valid: true};
+
+# The agents that need attention: blocked, then done and unseen, in attention order. Working,
+# done and seen, idle and no-status agents never need it.
+def attentionqueue($home):
+  agentrecords($home) | map(select(.class <= 1)) | to_entries | attentionsort | map(.value);
+
+# Terminals in the tab Herdr currently shows, sub-agents at any depth included; input is the
+# `herdr-app ls` tree. An empty or unreadable tree yields [].
+def currenttab:
+  [.spaces[]? | select(.active == true) | .tabs[]? | select(.active == true)
+   | .. | objects | .terminal? // empty] | unique;
+
+# The queue minus every entry whose terminal is on screen, so a repeat press steps on.
+def attentiontarget($tab): map(select(.address as $a | any($tab[]; . == $a) | not));

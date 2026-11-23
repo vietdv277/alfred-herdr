@@ -31,6 +31,13 @@ workflow through the external trigger `panel`:
 osascript -e 'tell application id "com.runningwithcrayons.Alfred" to run trigger "panel" in workflow "com.vietdv277.alfred-herdr"'
 ```
 
+Type `hdn`, or press <kbd>↩</kbd> on its one row, to jump straight to the agent that most needs
+attention: the newest blocked agent, or the newest `done` agent not yet seen. Agents already on
+screen in the current Herdr tab are skipped while Herdr is in front, so pressing `hdn` again
+steps to the next one. The
+workflow also carries a hotkey trigger for the same jump, unassigned until a key is set on it in
+Alfred.
+
 ## Notifier
 
 A background watcher posts one macOS banner the moment an agent turns `blocked` or `done` while

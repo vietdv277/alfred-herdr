@@ -1,0 +1,30 @@
+{
+  "terminals": [
+    {"address": "d-working", "name": "long-build", "state": "live", "cwd": "/Users/test/dev/api",
+     "parent": null, "turn": 11, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "2.1.330", "argv": ["opencode"]},
+     "status": {"app": "opencode", "state": "working", "msg": "Compiling"},
+     "status_ms": 1795363999000,
+     "labels": {"herdr.seen": "11", "where": "main · 4"}},
+    {"address": "d-done-seen", "name": "read-already", "state": "live", "cwd": "/Users/test/dev/api",
+     "parent": null, "turn": 3, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "2.1.330", "argv": ["claude"]},
+     "status": {"app": "claude-code", "state": "done"},
+     "status_ms": 1795363998000,
+     "labels": {"herdr.seen": "3", "where": "main · 3"}},
+    {"address": "d-done-new-old", "name": "lint-clean", "state": "live", "cwd": "/Users/test/dev/api",
+     "parent": null, "turn": 5, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "1.4.2", "argv": ["kiro-cli"]},
+     "status": {"app": "kiro-cli", "state": "done"},
+     "status_ms": 1795350000000,
+     "labels": {"herdr.seen": "4", "where": "main · 2"}},
+    {"address": "d-done-new", "name": "tests-green", "state": "live", "cwd": "/Users/test/dev/api",
+     "parent": null, "turn": 9, "argv": ["/bin/zsh", "-l"],
+     "foreground": {"name": "1.9.0", "argv": ["codex"]},
+     "status": {"app": "codex", "state": "done"},
+     "status_ms": 1795362000000,
+     "labels": {"herdr.seen": "8", "where": "main · 1"}}
+  ],
+  "machines": [],
+  "hidden_finished": 0
+}
