@@ -79,6 +79,10 @@ bin/build-notifier    # ~/Applications/Herdr Agents.app
 bin/install-notifier  # ~/Library/LaunchAgents/com.vietdv277.alfred-herdr.watch.plist
 ```
 
+`install-notifier` copies the watcher to `~/Library/Application Support/alfred-herdr` (override with
+`NOTIFY_HOME`), because launchd cannot read a checkout under `~/Documents`. Re-run it after changing
+`watch`, `focus.sh` or `workflow/lib`.
+
 3. Allow notifications when macOS asks on the first banner. The permission sits under
 `Herdr Agents` in System Settings › Notifications, and survives a rebuild under the same identity.
 

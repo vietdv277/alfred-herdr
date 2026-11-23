@@ -133,9 +133,14 @@ fi
 
 # The install script's generation step, without launchctl.
 (( total++ ))
-if out=$(bin/make-watch-plist build/watch-launchagent.plist 2>&1) &&
+if out=$({ staged=$(bin/stage-notifier build/runtime) &&
+            bin/make-watch-plist build/watch-launchagent.plist "$staged"; } 2>&1) &&
    [[ $(plutil -extract ProgramArguments json -o - build/watch-launchagent.plist | jq -c .) ==
-      "[\"/bin/zsh\",\"$repo/workflow/scripts/watch\"]" ]]; then
+      "[\"/bin/zsh\",\"$repo/build/runtime/workflow/scripts/watch\"]" ]] &&
+   cmp -s workflow/scripts/focus.sh build/runtime/workflow/scripts/focus.sh &&
+   cmp -s workflow/lib/notify.jq build/runtime/workflow/lib/notify.jq &&
+   ! bin/stage-notifier "$HOME/Documents/alfred-herdr-test" 2>/dev/null &&
+   [[ ! -e $HOME/Documents/alfred-herdr-test ]]; then
   print -r -- "ok   notifier.launchagent"
 else
   print -r -- "FAIL notifier.launchagent"
