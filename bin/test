@@ -12,26 +12,28 @@ hc_fail="herdr: no running core"
 home=/Users/test
 export HOME=$home
 
+# Ages in subtitles are measured from a fixed "now" so the recorded rows stay stable.
+export HERDR_NOW_MS=1795364000000
+
 failed=0
 total=0
 
-check() { # check <case> <fixture file|fail> <query> <hd|hdp>
+check() { # check <case> <fixture file|fail|rpc-error> <query> <hd|hdp>
   local case=$1 fixture=$2 query=$3 which=$4 out want
   local expected=tests/expected/$case.$which.json
+  local -a env_vars
   (( total++ ))
 
-  if [[ $fixture == fail ]]; then
-    if [[ $which == hd ]]; then
-      out=$(HC=$fake HC_FAIL=$hc_fail /bin/zsh workflow/scripts/agents.sh "$query")
-    else
-      out=$(HC=$fake HC_FAIL=$hc_fail /bin/zsh workflow/panel.alfredui/scripts/pulse)
-    fi
-  elif [[ $which == hd ]]; then
-    out=$(HC=$fake HC_FIXTURE=$repo/tests/fixtures/$fixture \
-      /bin/zsh workflow/scripts/agents.sh "$query")
+  case $fixture in
+    fail) env_vars=(HC=$fake HC_FAIL=$hc_fail) ;;
+    rpc-error) env_vars=(HC=$fake HC_RPC_ERROR=1) ;;
+    *) env_vars=(HC=$fake HC_FIXTURE=$repo/tests/fixtures/$fixture) ;;
+  esac
+
+  if [[ $which == hd ]]; then
+    out=$(env $env_vars /bin/zsh workflow/scripts/agents.sh "$query")
   else
-    out=$(HC=$fake HC_FIXTURE=$repo/tests/fixtures/$fixture \
-      /bin/zsh workflow/panel.alfredui/scripts/pulse)
+    out=$(env $env_vars /bin/zsh workflow/panel.alfredui/scripts/pulse)
   fi
 
   # The panel's icons are absolute; record and compare them as @ICONS@.
@@ -55,10 +57,14 @@ check() { # check <case> <fixture file|fail> <query> <hd|hdp>
 check mixed mixed.json "" hd
 check mixed mixed.json "" hdp
 check mixed-query mixed.json "api blocked" hd
+check attention attention.json "" hd
+check attention attention.json "" hdp
 check empty empty.json "" hd
 check empty empty.json "" hdp
 check fail fail "" hd
 check fail fail "" hdp
+check rpc-error rpc-error "" hd
+check rpc-error rpc-error "" hdp
 
 if (( failed > 0 )); then
   print -r -- "$failed of $total cases failed"
