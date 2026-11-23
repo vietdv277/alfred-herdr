@@ -15,6 +15,6 @@ done
 
 mkdir -p "$dest/workflow/scripts" "$dest/workflow/lib"
 cp -p workflow/scripts/watch workflow/scripts/focus.sh "$dest/workflow/scripts/"
-cp -p workflow/lib/*.jq "$dest/workflow/lib/"
+cp -p workflow/lib/*.jq workflow/lib/*.zsh "$dest/workflow/lib/"
 
 print -r -- "$dest/workflow/scripts/watch"
