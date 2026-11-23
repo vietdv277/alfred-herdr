@@ -1,29 +1,42 @@
 #!/bin/zsh
-# Alfred UI pulse: rebuild the agent rows from `hc ls --json` as a JSON update action.
+# Alfred UI pulse: rebuild the agent rows from the Herdr `terminal.list` reply as a JSON update.
 set -u
 PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 
-out=$("${HC:-hc}" ls --json 2>&1) || {
-  jq -cn --arg e "Herdr core is not running: $out" \
+hc_bin=${HC:-hc}
+icons=${0:A:h:h:h}/icons
+lib=${0:A:h:h:h}/lib
+# Age in subtitles is measured from here; a fixed value keeps tests deterministic.
+now=${HERDR_NOW_MS:-$(( $(date +%s) * 1000 ))}
+request='{"jsonrpc":"2.0","id":1,"method":"terminal.list","params":{}}'
+
+fail() {
+  jq -cn --arg e "Herdr core is not running: $1" \
     '{update: {relayout: true, ids: {summary: {text: $e}, agents: {data: {type: "basic", src: []}}}}}'
   exit 0
 }
 
-icons=${0:A:h:h:h}/icons
-lib=${0:A:h:h:h}/lib
-jq -c -L "$lib" --arg home "$HOME" --arg icons "$icons" '
+reply=$("$hc_bin" connect 2>&1 <<<$request) || fail "${reply:-$hc_bin connect failed}"
+
+# One JSON line per message; the reply to request id 1 carries the result.
+result=$(print -r -- "$reply" | jq -c 'first(select(.id == 1) | .result) // empty' 2>/dev/null) ||
+  fail "unexpected hc connect output: ${reply:0:160}"
+[[ -n $result ]] || fail "${${reply:0:160}:-$hc_bin connect gave no reply}"
+
+jq -c -L "$lib" --arg home "$HOME" --arg icons "$icons" --argjson now "$now" '
   include "agents";
   agentrecords($home)
-  | to_entries | sort_by((.value.status | rank), .key) | map(.value) as $rows
-  | ($rows | map(.status // "none") | group_by(.)
-     | sort_by((.[0] | rank)) | map("\(length) \(.[0])") | join(" · ")) as $counts
+  | to_entries | attentionsort | map(.value) as $rows
+  | ($rows | map(.class) | group_by(.) | sort_by(.[0])) as $groups
+  | ["blocked","new","working","done","idle","none"] as $names
+  | ($groups | map("\(length) \($names[.[0]])") | join(" · ")) as $counts
   | {update: {relayout: true, ids: {
       summary: {text: (if ($rows | length) == 0 then "No Herdr agents running" else $counts end)},
       agents: {data: {type: "basic", src: [$rows[] | {
         uid: .address,
         "icon.image": {type: "file", size: {width: 28, height: 28},
-                       src: (.status as $s | (.agent // "?") | iconpath($icons; $s))},
+                       src: (.status as $s | .agent | iconpath($icons; $s))},
         "title.text": "\(.name // .agent) — \(.where // "")",
-        "sub.text": "\(.status | statusword) · \(.agent) · turn \(.turn // 0) · \(.cwdshort)"
+        "sub.text": "\(statusline($now)) · \(.agent) · turn \(.turn) · \(.cwdshort)"
       }]}}
-    }}}' <<<"$out"
+    }}}' <<<"$result"

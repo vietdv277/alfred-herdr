@@ -1,6 +1,7 @@
 #!/bin/sh
-# Stand-in for `hc` in bin/test: prints the fixture in $HC_FIXTURE for `ls --json`,
-# or fails with the message in $HC_FAIL so the "Herdr core is not running" paths run.
+# Stand-in for `hc` in bin/test: answers `connect` with the fixture in $HC_FIXTURE as the
+# terminal.list result, fails with the message in $HC_FAIL so the "Herdr core is not running"
+# paths run, or answers an error reply when $HC_RPC_ERROR is set.
 set -u
 
 if [ -n "${HC_FAIL:-}" ]; then
@@ -8,9 +9,18 @@ if [ -n "${HC_FAIL:-}" ]; then
   exit 1
 fi
 
-case "${1:-} ${2:-}" in
-  "ls --json")
-    cat "${HC_FIXTURE:?HC_FIXTURE is not set}"
+case "${1:-}" in
+  connect)
+    request=$(cat)
+    case $request in
+      *terminal.list*) ;;
+      *) echo "fake-hc: unexpected request: $request" >&2; exit 2 ;;
+    esac
+    if [ -n "${HC_RPC_ERROR:-}" ]; then
+      printf '%s\n' '{"jsonrpc":"2.0","id":1,"error":{"code":-32601,"message":"unknown method"}}'
+    else
+      printf '{"jsonrpc":"2.0","id":1,"result":%s}\n' "$(jq -c . "${HC_FIXTURE:?HC_FIXTURE is not set}")"
+    fi
     ;;
   *)
     echo "fake-hc: unsupported call: $*" >&2
