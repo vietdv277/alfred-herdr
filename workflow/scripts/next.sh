@@ -31,8 +31,22 @@ core_down() {
 
 hc_terminal_list || core_down
 
-# The tab Herdr shows is what a repeated press steps past; no tree means no skipping.
-ls_out=$("$app_bin" ls 2>/dev/null) || ls_out=
+# Bundle id of the front app; HERDR_FRONT_CMD replaces lsappinfo in tests.
+front_bundle() {
+  if [[ -n ${HERDR_FRONT_CMD:-} ]]; then
+    ${=HERDR_FRONT_CMD} </dev/null 2>/dev/null
+    return
+  fi
+  local id
+  id=$(lsappinfo front </dev/null 2>/dev/null) || return 1
+  lsappinfo info -only bundleID "$id" </dev/null 2>/dev/null |
+    sed -n 's/.*bundleID[^=]*="\([^"]*\)".*/\1/p'
+}
+
+# A repeated press steps past the tab Herdr shows. Herdr marks a tab seen only while it is in
+# front, so with another app in front nothing is skipped; no tree means no skipping either.
+ls_out=
+[[ $(front_bundle) == dev.herdr.app ]] && { ls_out=$("$app_bin" ls 2>/dev/null) || ls_out= }
 
 sel=$(jq -c -L "$lib" --arg ls "$ls_out" --arg home "$HOME" --argjson now "$now" '
   include "agents";

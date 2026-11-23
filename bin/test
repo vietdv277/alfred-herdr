@@ -85,6 +85,7 @@ hdn_env() { # hdn_env <fixture file|fail|rpc-error> <herdr-app ls file|fail|->
     *) hdn_vars+=("HERDR_LS=$repo/tests/fixtures/$ls") ;;
   esac
   hdn_vars+=("HERDR_APP=$fake_app")
+  hdn_vars+=("HERDR_FRONT_CMD=print -r -- ${HDN_FRONT:-dev.herdr.app}")
 }
 
 check_hdn() { # check_hdn <case> <fixture file|fail|rpc-error> <herdr-app ls file|fail|->
@@ -144,6 +145,7 @@ check_hdn done queue-done.json -
 check_hdn tab queue.json ls-tab-blocked.json
 check_hdn subagent queue.json ls-tab-subagent.json
 check_hdn tab-all queue.json ls-tab-all.json
+HDN_FRONT=com.example.other check_hdn background queue.json ls-tab-all.json
 check_hdn empty empty.json -
 check_hdn ls-fail queue.json fail
 check_hdn fail fail -
@@ -153,6 +155,7 @@ check_jump target queue.json -
 check_jump tab queue.json ls-tab-blocked.json
 check_jump none empty.json -
 check_jump tab-all queue.json ls-tab-all.json
+HDN_FRONT=com.example.other check_jump background queue.json ls-tab-all.json
 check_jump core-down fail -
 
 # The watcher: one `hc events` stream from tests/fixtures/events-*.jsonl through a fake notify
