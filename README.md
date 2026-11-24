@@ -135,6 +135,9 @@ bin/make-icons  # re-renders workflow/icons/ from assets/agents/*.svg (rsvg-conv
 bin/package     # builds build/Herdr-Agents.alfredworkflow from the committed workflow/ tree
 ```
 
+Design and plan: [docs/architecture.md](docs/architecture.md) and
+[docs/roadmap.md](docs/roadmap.md); progress is tracked in the pinned roadmap issue #12.
+
 `bin/test` replays `tests/fixtures` through a fake `hc` and diffs `hd`, `hdp`, `hdn` and `hdr`
 against `tests/expected/`; jq only, no Alfred or Herdr. The `hdr` send step is recorded through a
 fake `hc send` and a fake banner, so the message argv is checked as it leaves Alfred. The notifier

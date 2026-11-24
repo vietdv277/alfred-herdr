@@ -16,5 +16,6 @@ answered on a best-effort basis; this is a personal project with no response-tim
 ## Scope
 
 The workflow runs locally and makes no network requests. It reads agent state through Herdr Core
-(`hc`) and `herdr-app`, and sends follow-up prompts only when ⌘↩ is pressed in `hdr`. Issues in
-Herdr, Herdr Core or Alfred themselves belong to those projects.
+(`hc`) and `herdr-app`, and sends follow-up prompts only when ⌘↩ is pressed in `hdr`. The security model is
+described in [docs/architecture.md](docs/architecture.md#security-model). Issues in Herdr, Herdr
+Core or Alfred themselves belong to those projects.
