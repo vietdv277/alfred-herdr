@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/vietdv277/alfred-herdr/security/advisories/new
+    about: Report privately, not in a public issue.
+  - name: Alfred Forum topic
+    url: https://www.alfredforum.com/topic/24271-herdr-agents-see-jump-to-and-reply-to-herdr-coding-agents-from-alfred/
+    about: Questions and general feedback.
